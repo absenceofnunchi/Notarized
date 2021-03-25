@@ -9,10 +9,15 @@ import UIKit
 
 class MenuTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var customTableView: UITableView!
+//    let allMenu: [Menu] = [
+//        Menu(symbol: UIImage(systemName: "paperplane")!.withRenderingMode(.alwaysOriginal), title: "Upload Files"),
+//        Menu(symbol: UIImage(systemName: "square.stack.3d.up")!.withRenderingMode(.alwaysOriginal), title: "Browse Your Files"),
+//        Menu(symbol: UIImage(systemName: "wallet.pass")!.withRenderingMode(.alwaysOriginal), title: "Wallet")
+    //    ]
     let allMenu: [Menu] = [
-        Menu(symbol: UIImage(systemName: "paperplane")!.withRenderingMode(.alwaysOriginal), title: "Upload Files"),
-        Menu(symbol: UIImage(systemName: "square.stack.3d.up")!.withRenderingMode(.alwaysOriginal), title: "Browse Your Files"),
-        Menu(symbol: UIImage(systemName: "wallet.pass")!.withRenderingMode(.alwaysOriginal), title: "Wallet")
+        Menu(symbol: UIImage(systemName: "trash")!.withRenderingMode(.alwaysOriginal), title: "Upload Files"),
+        Menu(symbol: UIImage(systemName: "trash")!.withRenderingMode(.alwaysOriginal), title: "Browse Your Files"),
+        Menu(symbol: UIImage(systemName: "trash")!.withRenderingMode(.alwaysOriginal), title: "Wallet")
     ]
     var didTapMenuType: ((MenuType) -> Void)?
     weak var delegate: ContainerDelegate?

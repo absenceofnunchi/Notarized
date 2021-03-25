@@ -87,7 +87,7 @@ extension ContainerViewController: ContainerDelegate {
         oldPageVC.beginAppearanceTransition(false, animated: true)
         newPageVC.beginAppearanceTransition(true, animated: true)
 
-        UIView.transition(from: oldPageVC.view, to: newPageVC.view, duration: 0.4, options: .transitionCrossDissolve) { (_) in
+        UIView.transition(from: oldPageVC.view, to: newPageVC.view, duration: 0.1, options: .transitionCrossDissolve) { (_) in
             self.oldPageVC.endAppearanceTransition()
             self.newPageVC.endAppearanceTransition()
             self.newPageVC.didMove(toParent: self)
@@ -98,7 +98,6 @@ extension ContainerViewController: ContainerDelegate {
             self.oldPageVC.view.fill()
             self.oldPageVC.view.alpha = 1
             self.newPageVC = nil
-
         }
         dismiss(animated: true)
     }

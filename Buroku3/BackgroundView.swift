@@ -8,7 +8,7 @@
 import UIKit
 
 class BackgroundView: UIView {
-    let startingColor = UIColor(red: 65/255, green: 60/255, blue: 105/255, alpha: 1).cgColor
+    let startingColor = UIColor(red: 167/255, green: 197/255, blue: 235/255, alpha: 1).cgColor
     let finishingColor = UIColor(red: 102/255, green: 98/255, blue: 135/255, alpha: 1).cgColor
     
     init() {
@@ -53,7 +53,7 @@ extension BackgroundView {
         let gradientLayer = CAGradientLayer()
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 1)
         gradientLayer.endPoint = CGPoint(x: 0.0, y: 0.0)
-        gradientLayer.colors = [finishingColor, finishingColor]
+        gradientLayer.colors = [finishingColor, startingColor]
         gradientLayer.frame = self.bounds
         gradientLayer.mask = bgShapeLayer
         

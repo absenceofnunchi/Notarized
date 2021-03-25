@@ -11,3 +11,8 @@ import Foundation
 protocol CustomTabBarDelegate: AnyObject {
     func tabBarDidSelect(with tag: Int)
 }
+
+// MARK: - Wallet delegate
+protocol WalletDelegate: AnyObject {
+    func didProcessWallet()
+}
