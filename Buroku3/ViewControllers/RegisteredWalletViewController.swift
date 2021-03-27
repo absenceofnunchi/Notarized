@@ -15,7 +15,17 @@ class RegisteredWalletViewController: UIViewController {
     var ethLabel: UILabel!
     var sendButton: WalletButtonView!
     var receiveButton: WalletButtonView!
-
+    
+    let localDatabase = LocalDatabase()
+    let keyservice = KeysService()
+    var web3instance: web3 {
+        let web3 = Web3.InfuraRinkebyWeb3()
+        web3.addKeystoreManager(self.keyservice.keystoreManager())
+        return web3
+    }
+    let transactionService = TransactionService()
+    let alert = Alerts()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
                 
@@ -24,6 +34,12 @@ class RegisteredWalletViewController: UIViewController {
         
         configurePageVC()
         setSinglePageConstraints()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        configureWallet()
     }
 }
 
@@ -37,22 +53,24 @@ extension RegisteredWalletViewController {
         // eth label
         ethLabel = UILabel()
         ethLabel.text = "0 ETH"
-        ethLabel.textColor = UIColor(red: 74/255, green: 71/255, blue: 163/255, alpha: 1)
+        ethLabel.textColor = .white
         ethLabel.font = UIFont.systemFont(ofSize: 30, weight: .regular)
         ethLabel.sizeToFit()
         ethLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(ethLabel)
         
         // send button
-        sendButton = WalletButtonView(imageName: "arrow.up.to.line", labelName: "Send")
+        sendButton = WalletButtonView(imageName: "arrow.up.to.line", labelName: "Send", bgColor: UIColor(red: 47/255, green: 74/255, blue: 84/255, alpha: 1), labelTextColor: .white, imageTintColor: .white)
         sendButton.buttonAction = { [weak self] in
-            print("button tapped")
+            let sendVC = SendViewController()
+            sendVC.modalPresentationStyle = .fullScreen
+            self?.present(sendVC, animated: true, completion: nil)
         }
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(sendButton)
         
         // receive button
-        receiveButton = WalletButtonView(imageName: "arrow.down.to.line", labelName: "Receive")
+        receiveButton = WalletButtonView(imageName: "arrow.down.to.line", labelName: "Receive", bgColor: UIColor(red: 47/255, green: 74/255, blue: 84/255, alpha: 1), labelTextColor: .white, imageTintColor: .white)
         receiveButton.buttonAction = { [weak self] in
             let receiveVC = ReceiveViewController()
             receiveVC.modalPresentationStyle = .fullScreen
@@ -122,6 +140,26 @@ extension RegisteredWalletViewController {
     
     @objc func buttonHandler(_ sender: UIButton!) {
         
+    }
+    
+    func configureWallet() {
+        guard let address = Web3swiftService.currentAddress else {
+            alert.show("Error", with: "There was an error obtaining the wallet address", for: self)
+            return
+        }
+        
+        DispatchQueue.global().async {
+            do {
+                let balance = try Web3swiftService.web3instance.eth.getBalance(address: address)
+                if let balanceString = Web3.Utils.formatToEthereumUnits(balance, toUnits: .eth, decimals: 4) {
+                    DispatchQueue.main.async {
+                        self.ethLabel.text = "\(self.transactionService.stripZeros(balanceString)) ETH"
+                    }
+                }
+            } catch {
+                self.alert.show("Error", with: "Sorry, there was an error retrieving your balance.", for: self)
+            }
+        }
     }
 }
 

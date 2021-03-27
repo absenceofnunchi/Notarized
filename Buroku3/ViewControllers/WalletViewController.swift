@@ -62,6 +62,7 @@ extension WalletViewController {
         navBar?.standardAppearance.shadowImage = UIImage()
         navBar?.standardAppearance.shadowColor = .clear
         navBar?.standardAppearance.backgroundImage = UIImage()
+        navBar?.tintColor = .white
         
         rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "rectangle.stack.badge.plus"), style: .plain, target: self, action: #selector(buttonHandler))
         rightBarButtonItem?.tag = 1

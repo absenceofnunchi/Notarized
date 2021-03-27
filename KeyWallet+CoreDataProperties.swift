@@ -2,7 +2,7 @@
 //  KeyWallet+CoreDataProperties.swift
 //  Buroku3
 //
-//  Created by J C on 2021-03-18.
+//  Created by J C on 2021-03-26.
 //
 //
 
@@ -17,8 +17,8 @@ extension KeyWallet {
     }
 
     @NSManaged public var address: String?
-    @NSManaged public var isRegistered: Bool
     @NSManaged public var data: Data?
+    @NSManaged public var isRegistered: Bool
     @NSManaged public var userName: String?
 
 }

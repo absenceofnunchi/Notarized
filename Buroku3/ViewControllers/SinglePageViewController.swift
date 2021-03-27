@@ -26,6 +26,8 @@ class SinglePageViewController: UIViewController {
     let localDatabase = LocalDatabase()
     let keyService = KeysService()
     var delegate: WalletDelegate?
+    var tableView: UITableView!
+    var data: [TxModel]!
     
     init(gallery: String) {
         self.gallery = gallery
@@ -34,6 +36,17 @@ class SinglePageViewController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - loadView
+    override func loadView() {
+        super.loadView()
+        
+        if gallery == "2" {
+            tableView = UITableView()
+            tableView.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(tableView)
+        }
     }
     
     // MARK: - viewDidLoad
@@ -109,7 +122,8 @@ extension SinglePageViewController: UITextFieldDelegate {
     func createButton(title: String, tag: Int) -> UIButton {
         let button = UIButton()
 
-        button.backgroundColor = UIColor(red: 167/255, green: 197/255, blue: 235/255, alpha: 1)
+//        button.backgroundColor = UIColor(red: 167/255, green: 197/255, blue: 235/255, alpha: 1)
+        button.backgroundColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
 
         if title == NSLocalizedString(WalletMenu.delete.rawValue, comment: "") {
 //            button.backgroundColor = UIColor(red: 255/255, green: 85/255, blue: 73/255, alpha: 1)
@@ -136,16 +150,10 @@ extension SinglePageViewController: UITextFieldDelegate {
         return button
     }
     
-    func configureActivity() {
-        
-    }
-    
-    func setActivityConstriants() {
-        NSLayoutConstraint.deactivate(constraints)
-        
-    }
-    
     @objc func buttonHandler(_ sender: UIButton!) {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+        feedbackGenerator.impactOccurred()
+        
         switch sender.tag {
             case 1:
                 guard let address = wallet?.address else {
@@ -198,4 +206,42 @@ extension SinglePageViewController: UITextFieldDelegate {
                 break
         }
     }
+}
+
+extension SinglePageViewController: UITableViewDelegate, UITableViewDataSource {
+    // MARK: - configureActivity
+    func configureActivity() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: Cell.activityCell)
+        tableView.delegate = self
+        tableView.dataSource = self
+        
+        if let transations = localDatabase.getTransactions() {
+            data = transations
+        }
+    }
+    
+    // MARK: - setActivityConstraints
+    func setActivityConstriants() {
+        NSLayoutConstraint.deactivate(constraints)
+        constraints.append(contentsOf: [
+            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tableView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            tableView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.7),
+            tableView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+        ])
+        NSLayoutConstraint.activate(constraints)
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return data.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.activityCell, for: indexPath)
+        let transaction = data[indexPath.row]
+        cell.textLabel?.text = transaction.gasLimit
+        
+        return cell
+    }
+    
 }

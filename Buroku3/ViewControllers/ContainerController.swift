@@ -12,7 +12,6 @@ protocol ContainerDelegate: AnyObject {
 }
 
 class ContainerViewController: UIViewController {
-    var sideBarButton: UIButton!
     let slideInTransitionAnimator = SlideInTransitionAnimator()
     var mainVC: MainViewController!
     var filesVC = FilesViewController()
@@ -46,23 +45,17 @@ extension ContainerViewController {
         let image = UIImage(systemName: "line.horizontal.3.decrease", withConfiguration: imageConfig)!
         let leftBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(buttonHandler))
         self.navigationItem.leftBarButtonItem = leftBarButtonItem
+
+        let edgePan = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(buttonHandler))
+        edgePan.edges = .left
+        view.addGestureRecognizer(edgePan)
         
-  
-//        sideBarButton = UIButton.systemButton(with: image, target: self, action: #selector(buttonHandler))
-//        sideBarButton.tintColor = .white
-//        sideBarButton.translatesAutoresizingMaskIntoConstraints = false
-//        sideBarButton.layer.zPosition = 100
-//        view.insertSubview(sideBarButton, aboveSubview: mainVC.view)
     }
     
     // MARK: - Set constraints
     func setConstraints() {
         NSLayoutConstraint.activate([
-            // side bar button
-//            sideBarButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 10),
-//            sideBarButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-//            sideBarButton.widthAnchor.constraint(equalToConstant: 50),
-//            sideBarButton.heightAnchor.constraint(equalToConstant: 50),
+
         ])
     }
 
@@ -73,11 +66,18 @@ extension ContainerViewController {
         menuTableVC.delegate = self
         self.present(menuTableVC, animated: true, completion: nil)
     }
+    
+    @objc func gestureHandler() {
+        
+    }
 }
 
 extension ContainerViewController: ContainerDelegate {
     // MARK: - didSelectVC
     func didSelectVC(_ menuType: MenuType) {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+        feedbackGenerator.impactOccurred()
+        
         let destinationVC = menuType.VCType
         
         newPageVC = destinationVC.init()

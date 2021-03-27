@@ -9,7 +9,7 @@ import UIKit
 
 class UnregisteredWalletViewController: UIViewController {
     var backgroundView = BackgroundView2()
-    var containerView: UIView!
+    var containerView: BlurEffectContainerView!
     var createWalletButton: UIButton!
     var importWalletButton: UIButton!
     var walletLogoImageView: UIImageView!
@@ -28,10 +28,12 @@ class UnregisteredWalletViewController: UIViewController {
         
         UIView.animateKeyframes(withDuration: 0.6, delay: 0.0, animations: {
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.4) {
+                self.containerView.alpha = 1
                 self.containerView.transform = .identity
             }
             
             UIView.addKeyframe(withRelativeStartTime: 0.3, relativeDuration: 0.5) {
+                self.backgroundView.alpha = 1
                 self.backgroundView.transform = .identity
             }
         },
@@ -44,11 +46,13 @@ class UnregisteredWalletViewController: UIViewController {
         
         UIView.animateKeyframes(withDuration: 0.3, delay: 0.0, animations: {
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.4) {
-                self.backgroundView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height)
+                self.backgroundView.alpha = 0
+                self.backgroundView.transform = CGAffineTransform(translationX: 0, y: 80)
             }
             
             UIView.addKeyframe(withRelativeStartTime: 0.3, relativeDuration: 0.5) {
-                self.containerView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height)
+                self.containerView.alpha = 0
+                self.containerView.transform = CGAffineTransform(translationX: 0, y: 80)
             }
         },
         completion: nil
@@ -63,22 +67,8 @@ extension UnregisteredWalletViewController {
         view.addSubview(backgroundView)
         backgroundView.fill()
         
-        containerView = UIView()
-        containerView.layer.cornerRadius = 20
-        containerView.layer.shadowColor = UIColor.gray.cgColor
-        containerView.layer.shadowOpacity = 0.3
-        containerView.layer.shadowOffset = CGSize.zero
-        containerView.layer.shadowRadius = 6
-        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView = BlurEffectContainerView()
         view.addSubview(containerView)
-        
-        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = containerView.bounds
-        blurEffectView.layer.cornerRadius = 20
-        blurEffectView.clipsToBounds = true
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        containerView.addSubview(blurEffectView)
         
         imageContainerView = UIView()
         imageContainerView.backgroundColor = .black
@@ -99,7 +89,7 @@ extension UnregisteredWalletViewController {
         createWalletButton.layer.cornerRadius = 15
         createWalletButton.setTitle("Create Wallet", for: .normal)
         createWalletButton.addTarget(self, action: #selector(buttonHandler), for: .touchUpInside)
-        createWalletButton.tag = 2
+        createWalletButton.tag = 1
         createWalletButton.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(createWalletButton)
         
@@ -108,7 +98,7 @@ extension UnregisteredWalletViewController {
         importWalletButton.layer.cornerRadius = 15
         importWalletButton.setTitle("Import Wallet", for: .normal)
         importWalletButton.addTarget(self, action: #selector(buttonHandler), for: .touchUpInside)
-        importWalletButton.tag = 3
+        importWalletButton.tag = 2
         importWalletButton.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(importWalletButton)
     }
@@ -147,20 +137,22 @@ extension UnregisteredWalletViewController {
     }
     
     @objc func buttonHandler(_ sender: UIButton!) {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+        feedbackGenerator.impactOccurred()
+        
         switch sender.tag {
             case 1:
-                let createWalletVC = CreateWalletViewController()
-                self.navigationController?.pushViewController(createWalletVC, animated: true)
-            case 2:
                 let createWalletVC = CreateWalletViewController()
                 let delegateVC = self.parent as! WalletViewController
                 createWalletVC.delegate = delegateVC
                 createWalletVC.modalPresentationStyle = .fullScreen
                 present(createWalletVC, animated: true)
-            case 3:
-                let createWalletVC = CreateWalletViewController()
-                createWalletVC.modalPresentationStyle = .fullScreen
-                present(createWalletVC, animated: true)
+            case 2:
+                let importWalletVC = ImportWalletViewController()
+                let delegateVC = self.parent as! WalletViewController
+                importWalletVC.delegate = delegateVC
+                importWalletVC.modalPresentationStyle = .fullScreen
+                present(importWalletVC, animated: true)
             default:
                 break
         }

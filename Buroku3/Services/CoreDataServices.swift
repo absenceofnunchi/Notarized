@@ -95,4 +95,43 @@ class LocalDatabase {
             completion(error)
         }
     }
+    
+    func getTransactions() -> [TxModel]? {
+        let requestTransaction: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
+        
+        do {
+            let results = try mainContext.fetch(requestTransaction)
+            
+            let tx = results.map { result in
+                return TxModel.fromCoreData(crModel: result)
+            }
+            return tx
+        } catch {
+            print(error)
+            return nil
+        }
+    }
+    
+    func saveTransactionDetail(result: TxModel, completion: @escaping (Error?) -> Void) {
+        container.performBackgroundTask { (context) in
+            guard let entity = NSEntityDescription.insertNewObject(forEntityName: "TransactionModel", into: context) as? TransactionModel else { return }
+            entity.gasPrice = result.gasPrice
+            entity.gasLimit = result.gasLimit
+            entity.toAddress = result.toAddress
+            entity.value = result.value
+            entity.date = result.date
+            entity.nonce = result.nonce
+                
+            do {
+                try context.save()
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(error)
+                }
+            }
+        }
+    }
 }

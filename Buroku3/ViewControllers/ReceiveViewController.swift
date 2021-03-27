@@ -17,6 +17,7 @@ class ReceiveViewController: UIViewController {
     var shareButton: WalletButtonView!
     var stackView: UIStackView!
     var qrCodeImageView: UIImageView!
+    var qrCodeImage: UIImage!
     var addressLabel: EdgeInsetLabel!
 
     override func viewDidLoad() {
@@ -33,7 +34,7 @@ class ReceiveViewController: UIViewController {
         let totalCount = 5
         let duration = 1.0 / Double(totalCount)
         
-        let animation = UIViewPropertyAnimator(duration: 1, timingParameters: UICubicTimingParameters())
+        let animation = UIViewPropertyAnimator(duration: 0.8, timingParameters: UICubicTimingParameters())
         animation.addAnimations {
             UIView.animateKeyframes(withDuration: 0, delay: 0, animations: { [weak self] in
                 UIView.addKeyframe(withRelativeStartTime: 1 / Double(totalCount), relativeDuration: duration) {
@@ -41,17 +42,17 @@ class ReceiveViewController: UIViewController {
                     self?.qrCodeImageView.transform = .identity
                 }
                 
-                UIView.addKeyframe(withRelativeStartTime: 1 / Double(totalCount), relativeDuration: duration) {
+                UIView.addKeyframe(withRelativeStartTime: 2 / Double(totalCount), relativeDuration: duration) {
                     self?.addressLabel.alpha = 1
                     self?.addressLabel.transform = .identity
                 }
                 
-                UIView.addKeyframe(withRelativeStartTime: 2 / Double(totalCount), relativeDuration: duration) {
+                UIView.addKeyframe(withRelativeStartTime: 3 / Double(totalCount), relativeDuration: duration) {
                     self?.stackView.alpha = 1
                     self?.stackView.transform = .identity
                 }
                 
-                UIView.addKeyframe(withRelativeStartTime: 3 / Double(totalCount), relativeDuration: duration) {
+                UIView.addKeyframe(withRelativeStartTime: 4 / Double(totalCount), relativeDuration: duration) {
                     self?.backgroundView.alpha = 1
                     self?.backgroundView.transform = .identity
                 }
@@ -72,7 +73,7 @@ extension ReceiveViewController {
     func configureUI() {
         view.backgroundColor = .white
         backgroundView = BackgroundView3()
-        backgroundView.transform = CGAffineTransform(translationX: 0, y: 100)
+        backgroundView.transform = CGAffineTransform(translationX: 0, y: 40)
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         backgroundView.alpha = 0
         view.addSubview(backgroundView)
@@ -89,12 +90,13 @@ extension ReceiveViewController {
         closeButton.tintColor = .black
         view.addSubview(closeButton)
         
-        let qrCodeImage = generateQRCode(from: address)
+        qrCodeImage = generateQRCode(from: address)
         qrCodeImageView = UIImageView(image: qrCodeImage)
-        let origin = CGPoint(x: view.frame.size.width / 2 - 100, y: view.frame.size.height / 2 - 300)
-        qrCodeImageView.frame = CGRect(origin: origin, size: CGSize(width: 200, height: 200))
-        qrCodeImageView.transform = CGAffineTransform(translationX: 0, y: 100)
+//        let origin = CGPoint(x: view.frame.size.width / 2 - 100, y: view.frame.size.height / 2 - 300)
+//        qrCodeImageView.frame = CGRect(origin: origin, size: CGSize(width: 200, height: 200))
+        qrCodeImageView.transform = CGAffineTransform(translationX: 0, y: 40)
         qrCodeImageView.alpha = 0
+        qrCodeImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(qrCodeImageView)
         
         addressLabel = EdgeInsetLabel()
@@ -102,7 +104,7 @@ extension ReceiveViewController {
         BorderStyle.customShadowBorder(for: addressLabel)
         addressLabel.numberOfLines = 0
         addressLabel.alpha = 0
-        addressLabel.transform = CGAffineTransform(translationX: 0, y: 100)
+        addressLabel.transform = CGAffineTransform(translationX: 0, y: 40)
         addressLabel.text = address
         addressLabel.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         addressLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -114,12 +116,22 @@ extension ReceiveViewController {
             pasteboard.string = self?.address ?? ""
             print("copied")
         }
+        
         shareButton = WalletButtonView(imageName: "square.and.arrow.up", labelName: "Share")
+        shareButton.buttonAction = { [weak self] in
+            let shareSheetVC = UIActivityViewController(activityItems: [self?.address ?? "", self?.qrCodeImage as Any], applicationActivities: nil)
+            self?.present(shareSheetVC, animated: true, completion: nil)
+            if let pop = shareSheetVC.popoverPresentationController {
+                pop.sourceView = self?.view
+//                pop.sourceRect = CGRect(x: self?.view.bounds.midX, y: self?.view.bounds.height, width: 0, height: 0)
+                pop.permittedArrowDirections = []
+            }
+        }
+        
         stackView = UIStackView(arrangedSubviews: [copyButton, shareButton])
         stackView.axis = .horizontal
         stackView.distribution = .fillEqually
-//        stackView.spacing = 150
-        stackView.transform = CGAffineTransform(translationX: 0, y: 100)
+        stackView.transform = CGAffineTransform(translationX: 0, y: 40)
         stackView.alpha = 0
         stackView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stackView)
@@ -137,6 +149,10 @@ extension ReceiveViewController {
             backgroundView.widthAnchor.constraint(equalTo: view.widthAnchor),
             backgroundView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 3/5),
             backgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            // qr
+            qrCodeImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            qrCodeImageView.centerYAnchor.constraint(equalTo: view.topAnchor, constant: 200),
             
             // address label
             addressLabel.topAnchor.constraint(equalTo: qrCodeImageView.bottomAnchor, constant: 50),
@@ -160,7 +176,7 @@ extension ReceiveViewController {
         
         if let filter = CIFilter(name: "CIQRCodeGenerator") {
             filter.setValue(data, forKey: "inputMessage")
-            let transform = CGAffineTransform(scaleX: 1, y: 1)
+            let transform = CGAffineTransform(scaleX: 5.5, y: 5.5)
             
             if let output = filter.outputImage?.transformed(by: transform) {
                 return UIImage(ciImage: output)

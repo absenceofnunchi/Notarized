@@ -11,77 +11,96 @@ import QuickLook
 
 class MainViewController: UIViewController {
     var backgroundView: BackgroundView!
-    let animationView = AnimationView()
+    var containerView: BlurEffectContainerView!
     var tabBar: CustomTabBar!
     var documentPicker: DocumentPicker!
     var url: URL!
     var sideBarButton: UIButton!
-
+    var documentBrowseButton: UIButton!
+    var cameraButton: UIButton!
+    var imagePickerButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        configureBackground()
-        configureUI()
-        configureTabBar()
-        setConstraints()
+//        configureBackground()
+//        configureUI()
+//        configureTabBar()
+//        setConstraints()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        animationView.play()
-    }
-    
 }
 
 extension MainViewController {
     
-    // MARK: - Configure Background
+    // MARK: - configureBackground
     func configureBackground() {
-        backgroundView = BackgroundView()
-        view.addSubview(backgroundView)
-        backgroundView.fill()
         
-        // animation
-        animationView.animation = Animation.named("6")
-        animationView.translatesAutoresizingMaskIntoConstraints = false
-        animationView.backgroundColor = .white
-        animationView.contentMode = .scaleAspectFit
-        animationView.loopMode = .loop
-        animationView.alpha = 0
-        animationView.translatesAutoresizingMaskIntoConstraints = false
-        
-        //        let keypath = AnimationKeypath(keys: ["**", "Fill", "**", "Color"])
-        let keypath = AnimationKeypath(keypath: "**.**.**.Color")
-        let colorProvider = ColorValueProvider(UIColor(red: 102/255, green: 98/255, blue: 135/255, alpha: 1).lottieColorValue)
-        animationView.setValueProvider(colorProvider, keypath: keypath)
-        
-        view.insertSubview(animationView, at: 0)
-        
-        let animation = UIViewPropertyAnimator(duration: 0.8, curve: .linear) {
-            self.animationView.alpha = 1
-        }
-        animation.startAnimation()
     }
     
+    // MARK: - configureUI
     func configureUI() {
         // document picker
         documentPicker = DocumentPicker(presentationController: self, delegate: self)
+        
+        // container view
+        containerView = BlurEffectContainerView()
+        view.addSubview(containerView)
+        
+        // document browse button
+        documentBrowseButton = UIButton()
+        documentBrowseButton.tag = 1
+        documentBrowseButton.setTitle("Browse File", for: .normal)
+        documentBrowseButton.backgroundColor = .black
+        documentBrowseButton.addTarget(self, action: #selector(buttonHandler), for: .touchUpInside)
+        documentBrowseButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(documentBrowseButton)
+        
+        // camera button
+        guard let cameraImage = UIImage(systemName: "camera") else { return }
+        cameraButton = UIButton.systemButton(with: cameraImage, target: self, action: #selector(buttonHandler(_:)))
+        cameraButton.tag = 2
+        cameraButton.backgroundColor = .black
+        cameraButton.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(cameraButton)
+
+        // image picker button
+        guard let pickerImage = UIImage(systemName: "photo") else { return }
+        imagePickerButton = UIButton.systemButton(with: pickerImage, target: self, action: #selector(buttonHandler(_:)))
+        imagePickerButton.tag = 3
+        imagePickerButton.backgroundColor = .black
+        imagePickerButton.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(imagePickerButton)
     }
     
+    // MARK: - setConstraints
     func setConstraints() {
         NSLayoutConstraint.activate([
-            // animation
-            animationView.widthAnchor.constraint(equalToConstant: 200),
-            animationView.heightAnchor.constraint(equalToConstant: 200),
-            animationView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -20),
-            animationView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 20),
+            // container view
+            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+            containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1.2),
+            
+            // document browse button
+            documentBrowseButton.topAnchor.constraint(equalTo: containerView.topAnchor),
+            documentBrowseButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.8),
+            documentBrowseButton.heightAnchor.constraint(equalToConstant: 50),
+            
         ])
+    }
+    
+    @objc func buttonHandler(_ sender: UIButton!) {
+        switch sender.tag {
+            case 1:
+                break
+            default:
+                break
+        }
     }
 }
 
 
 // MARK: - Custom tab bar
-
 extension MainViewController: CustomTabBarDelegate {
     func tabBarDidSelect(with tag: Int) {
         switch tag {

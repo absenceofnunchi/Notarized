@@ -16,3 +16,8 @@ protocol CustomTabBarDelegate: AnyObject {
 protocol WalletDelegate: AnyObject {
     func didProcessWallet()
 }
+
+// MARK: - Scanner delegate
+protocol ScannerDelegate: AnyObject {
+    func scannerDidOutput(code: String)
+}

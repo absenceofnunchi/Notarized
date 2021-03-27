@@ -14,11 +14,21 @@ class WalletButtonView: UIView {
     var label: UILabel!
     var button: UIButton!
     var containerView = UIView()
+    var bgColor: UIColor!
+    var labelTextColor: UIColor!
+    var imageTintColor: UIColor!
     
-    init(imageName: String, labelName: String) {
+    init(imageName: String,
+         labelName: String, bgColor: UIColor? = UIColor(red: 74/255, green: 71/255, blue: 163/255, alpha: 1),
+         labelTextColor: UIColor? = UIColor(red: 74/255, green: 71/255, blue: 163/255, alpha: 1),
+         imageTintColor: UIColor? = .white
+         ) {
         super.init(frame: .zero)
-        self.image = UIImage(systemName: imageName)?.withTintColor(.white, renderingMode: .alwaysOriginal)
+        self.image = UIImage(systemName: imageName)?.withTintColor(imageTintColor!, renderingMode: .alwaysOriginal)
         self.labelName = labelName
+        self.bgColor = bgColor
+        self.labelTextColor = labelTextColor
+        
     }
     
     required init?(coder: NSCoder) {
@@ -35,7 +45,7 @@ class WalletButtonView: UIView {
 
 extension WalletButtonView {
     func configure() {
-        containerView.backgroundColor = UIColor(red: 74/255, green: 71/255, blue: 163/255, alpha: 1)
+        containerView.backgroundColor = bgColor
         containerView.frame = CGRect(origin: .zero, size: CGSize(width: 50, height: 50))
         containerView.layer.cornerRadius = containerView.frame.size.width / 2
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -49,7 +59,7 @@ extension WalletButtonView {
         label = UILabel()
         label.text = labelName
         label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = UIColor(red: 74/255, green: 71/255, blue: 163/255, alpha: 1)
+        label.textColor = labelTextColor
         label.sizeToFit()
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false

@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20A5364e" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="KeyWallet" representedClassName="KeyWallet" syncable="YES" codeGenerationType="class">
+    <entity name="KeyWallet" representedClassName="KeyWallet" syncable="YES">
         <attribute name="address" attributeType="String"/>
         <attribute name="data" optional="YES" attributeType="Binary"/>
         <attribute name="isRegistered" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="userName" optional="YES" attributeType="String"/>
     </entity>
+    <entity name="TransactionModel" representedClassName="TransactionModel" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="gasLimit" optional="YES" attributeType="String"/>
+        <attribute name="gasPrice" optional="YES" attributeType="String"/>
+        <attribute name="nonce" optional="YES" attributeType="String"/>
+        <attribute name="toAddress" optional="YES" attributeType="String"/>
+        <attribute name="value" optional="YES" attributeType="String"/>
+    </entity>
     <elements>
         <element name="KeyWallet" positionX="-63" positionY="-18" width="128" height="89"/>
+        <element name="TransactionModel" positionX="-54" positionY="18" width="128" height="119"/>
     </elements>
 </model>

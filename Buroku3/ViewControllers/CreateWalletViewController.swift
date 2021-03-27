@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Lottie
 
 class CreateWalletViewController: UIViewController {
     var mode: WalletCreationType = .createKey
@@ -17,42 +18,51 @@ class CreateWalletViewController: UIViewController {
     weak var delegate: WalletDelegate?
     var isWalletCreated = false
     
+    let animationView = AnimationView()
     var passwordTextField: UITextField!
     var repeatPasswordTextField: UITextField!
     var createButton: UIButton!
     var passwordsDontMatch: UILabel!
-    var enterPrivateKeyTextField: UITextField!
     var textFields = [UITextField]()
     var closeButton: UIButton!
-    var containerView: UIView!
+    var containerView: BlurEffectContainerView!
     var backgroundView: BackgroundView3!
     
     // MARK: - View did load
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureLogoAnimation()
         configureUI()
         setConstraints()
         self.hideKeyboardWhenTappedAround()
         passwordTextField.delegate = self
         repeatPasswordTextField.delegate = self
-        enterPrivateKeyTextField.delegate = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        UIView.animateKeyframes(withDuration: 0.3, delay: 0.0,
-            animations: {
-                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.4) {
-                    self.backgroundView.transform = .identity
-                }
-                
-                UIView.addKeyframe(withRelativeStartTime: 0.3, relativeDuration: 0.5) {
-                    self.containerView.transform = .identity
-                }
-            },
-            completion: nil
+        let totalCount = 4
+        let duration = 1.0 / Double(totalCount)
+        
+        UIView.animateKeyframes(withDuration: 0.3, delay: 0.0, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 1 / Double(totalCount), relativeDuration: duration) {
+                self.animationView.alpha = 1
+                self.animationView.transform = .identity
+            }
+            
+            UIView.addKeyframe(withRelativeStartTime: 2 / Double(totalCount), relativeDuration: duration) {
+                self.containerView.alpha = 1
+                self.containerView.transform = .identity
+            }
+            
+            UIView.addKeyframe(withRelativeStartTime: 3 / Double(totalCount), relativeDuration: duration) {
+                self.backgroundView.alpha = 1
+                self.backgroundView.transform = .identity
+            }
+        },
+        completion: nil
         )
     }
     
@@ -63,14 +73,14 @@ class CreateWalletViewController: UIViewController {
             delegate?.didProcessWallet()
         }
         
-        UIView.animateKeyframes(withDuration: 0.3, delay: 0.0,
+        UIView.animateKeyframes(withDuration: 0.4, delay: 0.0,
             animations: {
                 UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.4) {
-                    self.backgroundView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height)
+                    self.backgroundView.transform = CGAffineTransform(translationX: 0, y: 80)
                 }
                 
                 UIView.addKeyframe(withRelativeStartTime: 0.3, relativeDuration: 0.5) {
-                    self.containerView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height)
+                    self.containerView.transform = CGAffineTransform(translationX: 0, y: 80)
                 }
             },
             completion: nil
@@ -80,8 +90,26 @@ class CreateWalletViewController: UIViewController {
 
 extension CreateWalletViewController {
     
-    // MARK: - ConfigureUI
+    // MARK: - configureLogoAnimation
+    func configureLogoAnimation() {
+        // animation
+        animationView.animation = Animation.named("6")
+        animationView.alpha = 0
+        animationView.backgroundColor = .white
+        animationView.contentMode = .scaleAspectFit
+        animationView.loopMode = .loop
+        animationView.transform = CGAffineTransform(translationX: 0, y: 80)
+        animationView.translatesAutoresizingMaskIntoConstraints = false
+        
+        //        let keypath = AnimationKeypath(keys: ["**", "Fill", "**", "Color"])
+        let keypath = AnimationKeypath(keypath: "**.**.**.Color")
+        let colorProvider = ColorValueProvider(UIColor.black.lottieColorValue)
+        animationView.setValueProvider(colorProvider, keypath: keypath)
+        view.addSubview(animationView)
+        animationView.play()
+    }
     
+    // MARK: - ConfigureUI
     func configureUI() {
         view.backgroundColor = .white
         guard let image = UIImage(systemName: "multiply") else {
@@ -91,7 +119,8 @@ extension CreateWalletViewController {
         
         // background
         backgroundView = BackgroundView3()
-        backgroundView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height)
+        backgroundView.alpha = 0
+        backgroundView.transform = CGAffineTransform(translationX: 0, y: 80)
         view.addSubview(backgroundView)
         backgroundView.fill()
         
@@ -103,24 +132,10 @@ extension CreateWalletViewController {
         view.addSubview(closeButton)
         
         // container view
-        containerView = UIView()
-        containerView.layer.cornerRadius = 20
-        containerView.layer.shadowColor = UIColor.gray.cgColor
-        containerView.layer.shadowOpacity = 0.3
-        containerView.layer.shadowOffset = CGSize.zero
-        containerView.layer.shadowRadius = 6
-        containerView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.height)
-        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView = BlurEffectContainerView()
+        containerView.transform = CGAffineTransform(translationX: 0, y: 80)
+        containerView.alpha = 0
         view.addSubview(containerView)
-        
-        // blur effect
-        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = containerView.bounds
-        blurEffectView.layer.cornerRadius = 20
-        blurEffectView.clipsToBounds = true
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        containerView.addSubview(blurEffectView)
         
         // passwords don't match label
         passwordsDontMatch = UILabel()
@@ -150,15 +165,6 @@ extension CreateWalletViewController {
         repeatPasswordTextField.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(repeatPasswordTextField)
         
-        // enter private key
-        enterPrivateKeyTextField = UITextField()
-        enterPrivateKeyTextField.layer.borderWidth = 1
-        enterPrivateKeyTextField.layer.borderColor = UIColor.lightGray.cgColor
-        enterPrivateKeyTextField.setLeftPaddingPoints(10)
-        enterPrivateKeyTextField.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(enterPrivateKeyTextField)
-        enterPrivateKeyTextField.isHidden = true
-        
         // create wallet button
         createButton = UIButton()
         createButton.setTitle("Create Wallet", for: .normal)
@@ -180,6 +186,12 @@ extension CreateWalletViewController {
             closeButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             closeButton.widthAnchor.constraint(equalToConstant: 60),
             closeButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            // animation view
+            animationView.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),
+            animationView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            animationView.heightAnchor.constraint(equalToConstant: 200),
+            animationView.widthAnchor.constraint(equalTo: animationView.heightAnchor),
             
             // container view
             containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -216,6 +228,9 @@ extension CreateWalletViewController {
     // MARK: - Button Handler
     
     @objc func buttonHandler(_ sender: UIButton!) {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+        feedbackGenerator.impactOccurred()
+        
         switch sender.tag {
             case 1:
                 self.dismiss(animated: true, completion: nil)
@@ -236,7 +251,7 @@ extension CreateWalletViewController {
         
         passwordsDontMatch.isHidden = true
         
-        walletController.createWallet(with: mode, password: passwordTextField.text, key: enterPrivateKeyTextField.text) { (error) in
+        walletController.createWallet(with: mode, password: passwordTextField.text, key: nil) { (error) in
             guard error == nil else {
                 self.alerts.show(error, for: self)
                 return
@@ -263,18 +278,19 @@ extension CreateWalletViewController: UITextFieldDelegate {
         createButton.isEnabled = false
         
         switch textField {
-            case enterPrivateKeyTextField:
-                if passwordTextField.text == repeatPasswordTextField.text &&
-                    !(passwordTextField.text?.isEmpty ?? true) &&
-                    !futureString.isEmpty && ((passwordTextField.text?.count)! > 4) {
-                    createButton.isEnabled = true
-                }
+//            case enterPrivateKeyTextField:
+//                if passwordTextField.text == repeatPasswordTextField.text &&
+//                    !(passwordTextField.text?.isEmpty ?? true) &&
+//                    !futureString.isEmpty && ((passwordTextField.text?.count)! > 4) {
+//                    createButton.isEnabled = true
+//                }
             case passwordTextField:
                 if !futureString.isEmpty &&
                     futureString == repeatPasswordTextField.text ||
                     repeatPasswordTextField.text?.isEmpty == true {
                     passwordsDontMatch.isHidden = true
-                    createButton.isEnabled = (!(enterPrivateKeyTextField.text?.isEmpty ?? true) || mode == .createKey)
+                    createButton.isEnabled = (mode == .createKey)
+//                    createButton.isEnabled = (!(enterPrivateKeyTextField.text?.isEmpty ?? true) || mode == .createKey)
                 } else {
                     passwordsDontMatch.isHidden = false
                     createButton.isEnabled = false
@@ -283,7 +299,7 @@ extension CreateWalletViewController: UITextFieldDelegate {
                 if !futureString.isEmpty &&
                     futureString == passwordTextField.text {
                     passwordsDontMatch.isHidden = true
-                    createButton.isEnabled = (!(enterPrivateKeyTextField.text?.isEmpty ?? true) || mode == .createKey)
+                    createButton.isEnabled = (mode == .createKey)
                 } else {
                     passwordsDontMatch.isHidden = false
                     createButton.isEnabled = false
