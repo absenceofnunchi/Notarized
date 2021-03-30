@@ -330,7 +330,6 @@ extension SendViewController: UITextFieldDelegate {
                             DispatchQueue.global().async {
                                 do {
                                     let result = try transaction.send(password: password, transactionOptions: nil)
-                                    
                                     let tran = result.transaction
 
                                     let txModel = TxModel(gasPrice: tran.gasPrice.description, gasLimit: tran.gasLimit.description, toAddress: tran.to.address, value: tran.value!.description, date: Date(), nonce: tran.nonce.description)
@@ -386,7 +385,6 @@ extension SendViewController: UITextFieldDelegate {
                 break
         }
     }
-    
 }
 
 extension SendViewController: ScannerDelegate {
@@ -396,5 +394,3 @@ extension SendViewController: ScannerDelegate {
         destinationTextField.text = code
     }
 }
-
-

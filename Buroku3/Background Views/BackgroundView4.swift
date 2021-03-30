@@ -13,10 +13,7 @@
 import UIKit
 
 class BackgroundView4: UIView {
-//    let startingColor = UIColor(red: 167/255, green: 197/255, blue: 235/255, alpha: 1).cgColor
-//    let startingColor = UIColor(red: 74/255, green: 71/255, blue: 163/255, alpha: 1).cgColor
     let startingColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1).cgColor
-//    let startingColor = UIColor.black.cgColor
     let finishingColor = UIColor(red: 102/255, green: 98/255, blue: 135/255, alpha: 1).cgColor
     
     init() {
@@ -47,19 +44,6 @@ extension BackgroundView4 {
         bgShapeLayer.path = initialPath
         bgShapeLayer.lineJoin = .round
         
-        let secondPath = CGMutablePath()
-        secondPath.move(to: CGPoint(x: 0, y: y / 10 * 7))
-        secondPath.addArc(tangent1End: CGPoint(x: x / 11, y: y / 10 * 8.5), tangent2End: CGPoint(x: x / 8 * 8.5, y: y / 10 * 8.5), radius: 80)
-        secondPath.addArc(tangent1End: CGPoint(x: x / 8 * 8.5, y: y / 10 * 8.5), tangent2End: CGPoint(x: x, y: y), radius: 50)
-        secondPath.addLine(to: CGPoint(x: x, y: y))
-        secondPath.addLine(to: CGPoint(x: x, y: 0))
-        secondPath.addLine(to: .zero)
-        secondPath.closeSubpath()
-        
-        let bgShapeLayer2 = CAShapeLayer()
-        bgShapeLayer2.path = secondPath
-        bgShapeLayer2.lineJoin = .round
-        
         let gradientLayer = CAGradientLayer()
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 1)
         gradientLayer.endPoint = CGPoint(x: 0.0, y: 0.0)
@@ -69,15 +53,6 @@ extension BackgroundView4 {
         gradientLayer.mask = bgShapeLayer
         
         self.layer.addSublayer(gradientLayer)
-        
-//        let gradientLayer2 = CAGradientLayer()
-//        gradientLayer2.startPoint = CGPoint(x: 1, y: 0)
-//        gradientLayer2.endPoint = CGPoint(x: 0, y: 1)
-//        gradientLayer2.colors = [finishingColor, startingColor]
-//        gradientLayer2.frame = self.bounds
-//        gradientLayer2.mask = bgShapeLayer2
-//
-//        self.layer.addSublayer(gradientLayer2)
     }
 }
 

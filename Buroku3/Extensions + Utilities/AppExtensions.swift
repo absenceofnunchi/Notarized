@@ -82,3 +82,23 @@ extension UITextField {
         self.rightViewMode = .always
     }
 }
+
+// MARK: - NSMutableData
+
+extension NSMutableData {
+    func appendString(_ string: String) {
+        if let data = string.data(using: String.Encoding.utf8, allowLossyConversion: true) {
+            append(data)
+        }
+    }
+}
+
+// MARK: - Data
+
+extension Data{
+    mutating func append(_ string: String, using encoding: String.Encoding = .utf8) {
+        if let data = string.data(using: encoding) {
+            append(data)
+        }
+    }
+}

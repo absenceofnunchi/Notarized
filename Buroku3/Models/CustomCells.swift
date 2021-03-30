@@ -10,4 +10,6 @@ import Foundation
 struct Cell {
     static var walletCell = "walletCell"
     static var activityCell = "activityCell"
+    static var filesCell = "filesCell"
 }
+

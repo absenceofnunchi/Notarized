@@ -30,6 +30,15 @@ extension ContainerViewController {
     
     // MARK: - Configure UI
     func configureUI() {
+        // configure navigation bar
+        let navBar = self.navigationController?.navigationBar
+        navBar?.standardAppearance.backgroundColor = UIColor.clear
+        navBar?.standardAppearance.backgroundEffect = nil
+        navBar?.standardAppearance.shadowImage = UIImage()
+        navBar?.standardAppearance.shadowColor = .clear
+        navBar?.standardAppearance.backgroundImage = UIImage()
+        navBar?.tintColor = .white
+        
         // Add main vc as a child vc
         mainVC = MainViewController()
         

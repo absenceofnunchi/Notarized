@@ -55,15 +55,6 @@ extension WalletViewController {
 
     // MARK: - Configure Navigation Item
     func configureNavigationItem() {
-        // nav bar attributes
-        let navBar = self.navigationController?.navigationBar
-        navBar?.standardAppearance.backgroundColor = UIColor.clear
-        navBar?.standardAppearance.backgroundEffect = nil
-        navBar?.standardAppearance.shadowImage = UIImage()
-        navBar?.standardAppearance.shadowColor = .clear
-        navBar?.standardAppearance.backgroundImage = UIImage()
-        navBar?.tintColor = .white
-        
         rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "rectangle.stack.badge.plus"), style: .plain, target: self, action: #selector(buttonHandler))
         rightBarButtonItem?.tag = 1
         self.parent?.navigationItem.setRightBarButton(rightBarButtonItem, animated: true)
