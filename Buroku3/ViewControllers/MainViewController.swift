@@ -25,15 +25,14 @@ class MainViewController: UIViewController {
     
     let transactionService = TransactionService()
     let alert = Alerts()
-
+    
     // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         configureBackground()
         configureUI()
         setConstraints()
-        
     }
     
     deinit {
@@ -85,7 +84,7 @@ extension MainViewController {
         cameraButton.backgroundColor = .black
         cameraButton.translatesAutoresizingMaskIntoConstraints = false
         lowerContainerView.addSubview(cameraButton)
-
+        
         // image picker button
         guard let pickerImage = UIImage(systemName: "photo")?.withTintColor(.white, renderingMode: .alwaysOriginal) else { return }
         imagePickerButton = UIButton.systemButton(with: pickerImage, target: self, action: #selector(buttonHandler))
@@ -177,13 +176,41 @@ extension MainViewController: UIImagePickerControllerDelegate & UINavigationCont
             print("No image found")
             return
         }
-
-        uploadImage(image: image)
         
+        alertWithTextField(image: image) { [weak self] (title, password) in
+            self?.uploadImage(image: image, title: title, password: password)
+        }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
+    }
+    
+    func alertWithTextField(image: UIImage? = nil, data: Data? = nil, completion: @escaping (String, String) -> Void) {
+        let ac = UIAlertController(title: "Upload to blockchain", message: "Enter the name you want to save your file as and the password of your wallet to authorize this transaction.", preferredStyle: .alert)
+        
+        ac.addTextField { (textField: UITextField!) in
+            textField.delegate = self
+            textField.placeholder = "Save as..."
+        }
+        
+        ac.addTextField { (textField: UITextField!) in
+            textField.delegate = self
+            textField.placeholder = "Password for your wallet"
+        }
+        
+        let enterAction = UIAlertAction(title: "Enter", style: .default) { [unowned ac](_) in
+            guard let textField = ac.textFields?.first, let title = textField.text else { return }
+            guard let textField2 = ac.textFields?[1], let password = textField2.text else { return }
+            
+            completion(title, password)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        ac.addAction(enterAction)
+        ac.addAction(cancelAction)
+        self.present(ac, animated: true, completion: nil)
     }
 }
 
@@ -237,8 +264,9 @@ extension MainViewController: UITextFieldDelegate {
         print("body", body)
         return body as Data
     }
-
-    func uploadImage(image: UIImage) {
+    
+    // MARK: - uploadImage
+    func uploadImage(image: UIImage, title: String, password: String) {
         // build request URL
         guard let requestURL = URL(string: "https://express-ipfs-4djcj3hprq-ue.a.run.app/addImage") else {
             return
@@ -267,17 +295,8 @@ extension MainViewController: UITextFieldDelegate {
             }
             
             if let data = data {
-                self.uploadToBlockchain(data: data)
-                
-//                if let responseString = String(bytes: data, encoding: .utf8) {
-//                    // The response body seems to be a valid UTF-8 string, so print that.
-//                    debugPrint("image uploaded successfully: \(responseString)")
-//
-//
-//                } else {
-//                    // Otherwise print a hex dump of the body.
-//                    debugPrint("Otherwise print a hex dump of the body", data as NSData)
-//                }
+                print("data after ipfs", data)
+                self.uploadToBlockchain(data: data, title: title, password: password)
             }
         })
         
@@ -345,61 +364,50 @@ extension MainViewController: UITextFieldDelegate {
     }
     
     // MARK: - uploadToBlockchain
-    func uploadToBlockchain(data: Data) {
+    func uploadToBlockchain(data: Data, title: String, password: String) {
         do {
             if let responseObj = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue:0)) as? [String:Any] {
                 if let status = responseObj["ipfs success"] as? [String: Any],
                    let path = status["path"],
-                   let size = status["size"] {
-                    print("path", path)
-                    print("size", size)
+                   let size = status["size"] as? NSNumber {
                     
-                    let parameters = [path, Date().description(with: .current)] as [AnyObject]
-                    transactionService.prepareTransactionForSettingFile(parameters: parameters) { (transaction, error) in
+                    let date = Date()
+                    let df = DateFormatter()
+                    df.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                    let dateString = df.string(from: date)
+                    
+                    let parameters = [path, dateString, size.intValue, title] as [AnyObject]
+                    transactionService.prepareTransactionForSettingFile(parameters: parameters) { [weak self](transaction, error) in
                         if let error = error {
                             switch error {
                                 case .contractLoadingError:
-                                    print("error 1")
+                                    print("contractLoadingError")
                                 case .createTransactionIssue:
-                                    print("error 2")
+                                    print("createTransactionIssue")
                                 default:
                                     break
                             }
                         }
                         
                         if let transaction = transaction {
-                            let ac = UIAlertController(title: "Enter the password", message: nil, preferredStyle: .alert)
-                            ac.addTextField { (textField: UITextField!) in
-                                textField.delegate = self
-                            }
-                            
-                            let enterAction = UIAlertAction(title: "Enter", style: .default) { [unowned ac, weak self](_) in
-                                guard let textField = ac.textFields?.first, let password = textField.text else { return }
-                                DispatchQueue.global().async {
-                                    do {
-                                        let result = try transaction.send(password: password, transactionOptions: nil)
-                                        print("result", result)
-                                        
-                                        DispatchQueue.main.async {
-                                            let finalAC = UIAlertController(title: "Success!", message: "Your file has been uploaded to the blockchain.", preferredStyle: .alert)
-                                            finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
-                                                self?.dismiss(animated: true, completion: nil)
-                                            }))
-                                            self?.present(finalAC, animated: true, completion: nil)
-                                        }
-                                    } catch {
-                                        DispatchQueue.main.async {
-                                            self?.alert.show("Error", with: "Sorry, there was an error uploading your file to a blockchain. Please try again.", for: self!)
-                                        }
+                            DispatchQueue.global().async {
+                                do {
+                                    let result = try transaction.send(password: password, transactionOptions: nil)
+                                    print("result", result)
+                                    
+                                    DispatchQueue.main.async {
+                                        let finalAC = UIAlertController(title: "Success!", message: "Your file has been uploaded to the blockchain.", preferredStyle: .alert)
+                                        finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
+                                            self?.dismiss(animated: true, completion: nil)
+                                        }))
+                                        self?.present(finalAC, animated: true, completion: nil)
+                                    }
+                                } catch {
+                                    DispatchQueue.main.async {
+                                        self?.alert.show("Error", with: "Sorry, there was an error uploading your file to a blockchain.", for: self!)
                                     }
                                 }
                             }
-                            
-                            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-                            
-                            ac.addAction(enterAction)
-                            ac.addAction(cancelAction)
-                            self.present(ac, animated: true, completion: nil)
                         }
                     }
                 }

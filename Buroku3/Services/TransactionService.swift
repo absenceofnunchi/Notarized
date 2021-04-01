@@ -158,7 +158,7 @@ class TransactionService {
             return
         }
         
-        let bytecode = Data(hex: accountBytecode1)
+        let bytecode = Data(hex: accountBytecode)
         guard let transaction = contract.deploy(bytecode: bytecode, parameters: [AnyObject](), extraData: Data(), transactionOptions: options) else {
             DispatchQueue.main.async {
                 completion(nil, SendEthErrors.createTransactionIssue)
@@ -195,7 +195,7 @@ class TransactionService {
             return
         }
         
-        guard let transaction = contract.method("setFile", parameters: parameters, extraData: Data(), transactionOptions: options) else {
+        guard let transaction = contract.write("setFile", parameters: parameters, extraData: Data(), transactionOptions: options) else {
             DispatchQueue.main.async {
                 completion(nil, SendEthErrors.createTransactionIssue)
             }

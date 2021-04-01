@@ -89,7 +89,15 @@ extension ContainerViewController: ContainerDelegate {
         
         let destinationVC = menuType.VCType
         
-        newPageVC = destinationVC.init()
+        if destinationVC == FilesViewController.self {
+            let fvc = FilesViewController()
+            let nav = UINavigationController(rootViewController: fvc)
+            nav.view.tag = 1000
+            newPageVC = nav
+        } else {
+            newPageVC = destinationVC.init()
+        }
+        
         addChild(newPageVC)
         newPageVC.view.alpha = 0
         oldPageVC.willMove(toParent: nil)

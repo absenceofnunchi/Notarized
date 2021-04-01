@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		49083FD82613E20900CC26C9 /* FilesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49083FD72613E20900CC26C9 /* FilesTableViewCell.swift */; };
+		49083FDB26152EB100CC26C9 /* SearchResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49083FDA26152EB100CC26C9 /* SearchResultsController.swift */; };
+		49083FE226153C6900CC26C9 /* FilesViewController + ResultsUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49083FE126153C6900CC26C9 /* FilesViewController + ResultsUpdate.swift */; };
 		492D693B2603C0DD00FCDD20 /* MenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D693A2603C0DD00FCDD20 /* MenuTableViewController.swift */; };
 		492D69402603C1ED00FCDD20 /* SlideInTransitionAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D693F2603C1EC00FCDD20 /* SlideInTransitionAnimator.swift */; };
 		492D69452603DE6100FCDD20 /* FilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D69442603DE6100FCDD20 /* FilesViewController.swift */; };
@@ -107,6 +109,8 @@
 /* Begin PBXFileReference section */
 		128F83FFA11BA7A507D36849 /* Pods-Buroku3.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Buroku3.debug.xcconfig"; path = "Target Support Files/Pods-Buroku3/Pods-Buroku3.debug.xcconfig"; sourceTree = "<group>"; };
 		49083FD72613E20900CC26C9 /* FilesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesTableViewCell.swift; sourceTree = "<group>"; };
+		49083FDA26152EB100CC26C9 /* SearchResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsController.swift; sourceTree = "<group>"; };
+		49083FE126153C6900CC26C9 /* FilesViewController + ResultsUpdate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FilesViewController + ResultsUpdate.swift"; sourceTree = "<group>"; };
 		492D693A2603C0DD00FCDD20 /* MenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuTableViewController.swift; sourceTree = "<group>"; };
 		492D693F2603C1EC00FCDD20 /* SlideInTransitionAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideInTransitionAnimator.swift; sourceTree = "<group>"; };
 		492D69442603DE6100FCDD20 /* FilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesViewController.swift; sourceTree = "<group>"; };
@@ -378,6 +382,7 @@
 				49624D42260145D9006C42AF /* ContainerController.swift */,
 				492D69472603DEF500FCDD20 /* MainViewController.swift */,
 				492D69442603DE6100FCDD20 /* FilesViewController.swift */,
+				49083FE126153C6900CC26C9 /* FilesViewController + ResultsUpdate.swift */,
 				492D69E0260548CA00FCDD20 /* CreateWalletViewController.swift */,
 				49A4BDDB2605A893009E8911 /* SettingsViewController.swift */,
 				495986512607A95F0018A0BC /* WalletViewController.swift */,
@@ -392,6 +397,7 @@
 				49D9C404260C51FA0014960A /* ScannerViewController.swift */,
 				498F17DF260E9B8500545190 /* ImportWalletViewController.swift */,
 				4966AC1E260A42540066908B /* TempViewController.swift */,
+				49083FDA26152EB100CC26C9 /* SearchResultsController.swift */,
 				4984E67B2610260B00868BB0 /* PreviewVC.swift */,
 			);
 			path = ViewControllers;
@@ -638,11 +644,13 @@
 				492D69452603DE6100FCDD20 /* FilesViewController.swift in Sources */,
 				492D69DE26051BD600FCDD20 /* Errors.swift in Sources */,
 				49D9C3FA260BB3D10014960A /* ReceiveViewController.swift in Sources */,
+				49083FE226153C6900CC26C9 /* FilesViewController + ResultsUpdate.swift in Sources */,
 				49E239692602F072006D2544 /* BackgroundView.swift in Sources */,
 				492D69E82605721800FCDD20 /* CustomCells.swift in Sources */,
 				49A4BDE02605AE3D009E8911 /* AlertsView.swift in Sources */,
 				49693BE4260E570800981064 /* TxModel.swift in Sources */,
 				49083FD82613E20900CC26C9 /* FilesTableViewCell.swift in Sources */,
+				49083FDB26152EB100CC26C9 /* SearchResultsController.swift in Sources */,
 				4966AC19260A422E0066908B /* UnregisteredWalletViewController.swift in Sources */,
 				49A4BDDC2605A893009E8911 /* SettingsViewController.swift in Sources */,
 				4984E679260FA49000868BB0 /* BackgroundView7.swift in Sources */,

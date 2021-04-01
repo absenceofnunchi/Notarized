@@ -43,14 +43,25 @@ extension UIView {
     }
     
     func dropShadow() {
-        layer.masksToBounds = false
-        layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.5
-        layer.shadowOffset = CGSize(width: -1, height: 1)
-        layer.shadowRadius = 1
-        layer.shadowPath = UIBezierPath(rect: self.bounds).cgPath
-        layer.shouldRasterize = true
-        layer.rasterizationScale = UIScreen.main.scale
+//        layer.masksToBounds = false
+//        layer.shadowColor = UIColor.black.cgColor
+//        layer.shadowOpacity = 0.5
+//        layer.shadowOffset = CGSize(width: -1, height: 1)
+//        layer.shadowRadius = 1
+//        layer.shadowPath = UIBezierPath(rect: self.bounds).cgPath
+//        layer.shouldRasterize = true
+//        layer.rasterizationScale = UIScreen.main.scale
+        
+        let borderColor = UIColor.lightGray
+        self.layer.borderWidth = 1
+        self.layer.masksToBounds = false
+        self.layer.cornerRadius = 7.0;
+        self.layer.borderColor = borderColor.withAlphaComponent(0.3).cgColor
+        self.layer.shadowColor = UIColor.black.cgColor
+        self.layer.shadowOffset = CGSize(width: 0, height: 0)
+        self.layer.shadowOpacity = 0.2
+        self.layer.shadowRadius = 4.0
+        self.layer.backgroundColor = UIColor.white.cgColor
     }
 }
 
