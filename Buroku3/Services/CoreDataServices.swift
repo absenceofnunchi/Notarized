@@ -9,7 +9,8 @@ import Foundation
 import CoreData
 
 class LocalDatabase {
-    lazy var container: NSPersistentContainer = NSPersistentContainer(name: "CoreDataModel")
+//    lazy var container: NSPersistentContainer = NSPersistentContainer(name: "CoreDataModel")
+    lazy var container: NSPersistentCloudKitContainer = NSPersistentCloudKitContainer(name: "CoreDataModel")
     private lazy var mainContext = self.container.viewContext
     
     init() {
@@ -96,7 +97,7 @@ class LocalDatabase {
         }
     }
     
-    func getTransactions() -> [TxModel]? {
+    func getAllTransactionHashes() -> [TxModel]? {
         let requestTransaction: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
         
         do {
@@ -112,25 +113,58 @@ class LocalDatabase {
         }
     }
     
-    func saveTransactionDetail(result: TxModel, completion: @escaping (Error?) -> Void) {
+    func getTransactionHash(fileHash: String) -> TxModel? {
+        let requestTransaction: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
+        requestTransaction.predicate = NSPredicate(format: "fileHash == %@", fileHash)
+        let sort = NSSortDescriptor(key: "date", ascending: true)
+        requestTransaction.sortDescriptors = [sort]
+        
+        do {
+            let results = try mainContext.fetch(requestTransaction)
+            guard let result = results.first else { print("no data"); return nil }
+            return TxModel.fromCoreData(crModel: result)
+        } catch {
+            print(error)
+            return nil
+        }
+    }
+    
+    // for sending ether from the wallet
+//    func saveTransactionDetail(result: TxModel, completion: @escaping (Error?) -> Void) {
+//        container.performBackgroundTask { (context) in
+//            guard let entity = NSEntityDescription.insertNewObject(forEntityName: "TransactionModel", into: context) as? TransactionModel else { return }
+//            entity.gasPrice = result.gasPrice
+//            entity.gasLimit = result.gasLimit
+//            entity.toAddress = result.toAddress
+//            entity.value = result.value
+//            entity.date = result.date
+//            entity.nonce = result.nonce
+//
+//            do {
+//                try context.save()
+//                DispatchQueue.main.async {
+//                    completion(nil)
+//                }
+//            } catch {
+//                DispatchQueue.main.async {
+//                    completion(error)
+//                }
+//            }
+//        }
+//    }
+    
+    // for uploading files
+    func saveTransactionDetail(txHash: String, fileHash: String? = nil, date: Date) {
         container.performBackgroundTask { (context) in
             guard let entity = NSEntityDescription.insertNewObject(forEntityName: "TransactionModel", into: context) as? TransactionModel else { return }
-            entity.gasPrice = result.gasPrice
-            entity.gasLimit = result.gasLimit
-            entity.toAddress = result.toAddress
-            entity.value = result.value
-            entity.date = result.date
-            entity.nonce = result.nonce
-                
+            entity.transactionHash = txHash
+            entity.fileHash = fileHash
+            entity.date = date
+            
             do {
                 try context.save()
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
             } catch {
-                DispatchQueue.main.async {
-                    completion(error)
-                }
+                print("error saving the upload detail")
             }
         }
     }

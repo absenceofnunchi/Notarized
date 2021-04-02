@@ -43,7 +43,7 @@ extension FilesTableViewCell {
         containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.dropShadow()
-        containerView.layoutMargins = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+        containerView.layoutMargins = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
         contentView.addSubview(containerView)
         
         nameLabel = createlabel(in: containerView, with: .black)
@@ -61,10 +61,10 @@ extension FilesTableViewCell {
     func setConstraints() {
         NSLayoutConstraint.activate([
             // container view
-            containerView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
-            containerView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            containerView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor, constant: 2),
+            containerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor, constant: -2),
+            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5),
             
             // name label
             nameLabel.topAnchor.constraint(equalTo: containerView.layoutMarginsGuide.topAnchor),
@@ -103,7 +103,7 @@ extension FilesTableViewCell {
         sizeLabel.text = "Size: \(size)"
         nameLabel.text = name
         
-        let mas = NSMutableAttributedString(string: " \(date)", attributes: nil)
+        let mas = NSMutableAttributedString(string: " \(date)", attributes: [.font: UIFont.systemFont(ofSize: 10)])
         
         let clockImage = UIImage(systemName:"clock")!.withRenderingMode(.alwaysOriginal)
         let clock = NSTextAttachment(image:clockImage)
@@ -115,6 +115,7 @@ extension FilesTableViewCell {
     func createlabel(in v: UIView, with color: UIColor = UIColor.gray) -> UILabel {
         let label = UILabel()
         label.textColor = color
+        label.font = UIFont.systemFont(ofSize: 15)
         label.lineBreakMode = .byTruncatingTail
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -133,7 +134,7 @@ class LineView: UIView {
         // Keep using the method addLine until you get to the one where about to close the path
 //        aPath.close()
         
-        UIColor.lightGray.set()
+        UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1).set()
         aPath.lineWidth = 1
         aPath.stroke()
     }

@@ -8,6 +8,7 @@
 import UIKit
 import Lottie
 import QuickLook
+import web3swift
 
 class MainViewController: UIViewController {
     var backgroundView: BackgroundView7!
@@ -177,7 +178,7 @@ extension MainViewController: UIImagePickerControllerDelegate & UINavigationCont
             return
         }
         
-        alertWithTextField(image: image) { [weak self] (title, password) in
+        alert.withTextField(delegate: self, controller: self, image: image) { [weak self] (title, password) in
             self?.uploadImage(image: image, title: title, password: password)
         }
     }
@@ -186,32 +187,7 @@ extension MainViewController: UIImagePickerControllerDelegate & UINavigationCont
         dismiss(animated: true, completion: nil)
     }
     
-    func alertWithTextField(image: UIImage? = nil, data: Data? = nil, completion: @escaping (String, String) -> Void) {
-        let ac = UIAlertController(title: "Upload to blockchain", message: "Enter the name you want to save your file as and the password of your wallet to authorize this transaction.", preferredStyle: .alert)
-        
-        ac.addTextField { (textField: UITextField!) in
-            textField.delegate = self
-            textField.placeholder = "Save as..."
-        }
-        
-        ac.addTextField { (textField: UITextField!) in
-            textField.delegate = self
-            textField.placeholder = "Password for your wallet"
-        }
-        
-        let enterAction = UIAlertAction(title: "Enter", style: .default) { [unowned ac](_) in
-            guard let textField = ac.textFields?.first, let title = textField.text else { return }
-            guard let textField2 = ac.textFields?[1], let password = textField2.text else { return }
-            
-            completion(title, password)
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        ac.addAction(enterAction)
-        ac.addAction(cancelAction)
-        self.present(ac, animated: true, completion: nil)
-    }
+
 }
 
 // MARK: - Document
@@ -229,16 +205,23 @@ extension MainViewController: QLPreviewControllerDataSource, QLPreviewController
         if let pickedDoc = document {
             let fileURL = pickedDoc.fileURL
             url = fileURL
-            print("fileURL", fileURL)
             
-            let data = try? Data(contentsOf: fileURL)
+            var retrievedData: Data!
+            do {
+                retrievedData = try Data(contentsOf: fileURL)
+            } catch {
+                alert.show(error, for: self)
+            }
+            
             let preview = PreviewVC()
             preview.dataSource = self
             preview.buttonAction = { [weak self] in
                 self?.dismiss(animated: true, completion: nil)
                 
-                if let data = data {
-                    self?.uploadFile(fileData: data)
+                if let data = retrievedData {
+                    self?.alert.withTextField(delegate: self!, controller: self!, data: data, completion: { (title, password) in
+                        self?.uploadFile(fileData: data, title: title, password: password)
+                    })
                 }
             }
             present(preview, animated: true, completion: nil)
@@ -295,7 +278,6 @@ extension MainViewController: UITextFieldDelegate {
             }
             
             if let data = data {
-                print("data after ipfs", data)
                 self.uploadToBlockchain(data: data, title: title, password: password)
             }
         })
@@ -310,7 +292,7 @@ extension MainViewController: UITextFieldDelegate {
     }
     
     // MARK: - uploadFile
-    func uploadFile(fileData: Data){
+    func uploadFile(fileData: Data, title: String, password: String){
         guard let requestURL = URL(string: "https://express-ipfs-4djcj3hprq-ue.a.run.app/addFile") else {
             return
         }
@@ -346,16 +328,13 @@ extension MainViewController: UITextFieldDelegate {
         request.httpBody = data
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).sync {
             let session = URLSession.shared
-            let task = session.dataTask(with: request, completionHandler: { (dataS, aResponse, error) in
+            let task = session.dataTask(with: request, completionHandler: { [weak self](data, aResponse, error) in
                 if let error = error {
-                    print("task error", error)
-                }else{
-                    do{
-                        let responseObj = try JSONSerialization.jsonObject(with: dataS!, options: JSONSerialization.ReadingOptions(rawValue:0)) as! [String:Any]
-                        print("res ob", responseObj)
-                    }catch {
-                        print("response obj error", error)
-                    }
+                    self?.alert.show(error, for: self!)
+                }
+                
+                if let data = data {
+                    self?.uploadToBlockchain(data: data, title: title, password: password)
                 }
             })
             
@@ -376,16 +355,26 @@ extension MainViewController: UITextFieldDelegate {
                     df.dateFormat = "yyyy-MM-dd HH:mm:ss"
                     let dateString = df.string(from: date)
                     
+                    print("path", path)
+                    print("size", size.intValue)
+                    
+                    
                     let parameters = [path, dateString, size.intValue, title] as [AnyObject]
                     transactionService.prepareTransactionForSettingFile(parameters: parameters) { [weak self](transaction, error) in
                         if let error = error {
                             switch error {
                                 case .contractLoadingError:
-                                    print("contractLoadingError")
+                                    DispatchQueue.main.async {
+                                        self?.alert.show("Error", with: "There was an error loading the contract.", for: self!)
+                                    }
                                 case .createTransactionIssue:
-                                    print("createTransactionIssue")
+                                    DispatchQueue.main.async {
+                                        self?.alert.show("Error", with: "There was an error creating the transaction.", for: self!)
+                                    }
                                 default:
-                                    break
+                                    DispatchQueue.main.async {
+                                        self?.alert.show("Error", with: "Sorry, there was an error uploading to the blockchain.", for: self!)
+                                    }
                             }
                         }
                         
@@ -393,18 +382,33 @@ extension MainViewController: UITextFieldDelegate {
                             DispatchQueue.global().async {
                                 do {
                                     let result = try transaction.send(password: password, transactionOptions: nil)
-                                    print("result", result)
+                                    print("result from send", result)
+                                    
+                                    // save
+                                    guard let path = path as? String else {
+                                        print("path not retrieved")
+                                        return
+                                    }
+                                    
+                                    let localDatabase = LocalDatabase()
+                                    localDatabase.saveTransactionDetail(txHash: result.hash, fileHash: path, date: Date())
                                     
                                     DispatchQueue.main.async {
                                         let finalAC = UIAlertController(title: "Success!", message: "Your file has been uploaded to the blockchain.", preferredStyle: .alert)
-                                        finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
-                                            self?.dismiss(animated: true, completion: nil)
-                                        }))
+                                        finalAC.addAction(UIAlertAction(title: "OK", style: .default))
                                         self?.present(finalAC, animated: true, completion: nil)
+                                    }
+                                } catch Web3Error.nodeError(let desc) {
+                                    if let index = desc.firstIndex(of: ":") {
+                                        let newIndex = desc.index(after: index)
+                                        let newStr = desc[newIndex...]
+                                        DispatchQueue.main.async {
+                                            self?.alert.show("Alert", with: String(newStr), for: self!)
+                                        }
                                     }
                                 } catch {
                                     DispatchQueue.main.async {
-                                        self?.alert.show("Error", with: "Sorry, there was an error uploading your file to a blockchain.", for: self!)
+                                        self?.alert.show("Error", with: "Sorry, there was an error uploading your file to a blockchain. Please verify that your password is correct.", for: self!)
                                     }
                                 }
                             }
@@ -414,9 +418,8 @@ extension MainViewController: UITextFieldDelegate {
             }
             
         } catch {
-            print("upload to blockchain error", error)
+            alert.show(error, for: self)
         }
-        
     }
 }
 
@@ -424,3 +427,40 @@ enum MethodHttp: String {
     case get = "GET"
     case post = "POST"
 }
+
+
+//path QmRFaAjp7DbJbR5gCWqi3YUP1j2mtmkR5ycadGj38zA5Xg
+//size 41588
+//result from send TransactionSendingResult(transaction: Transaction
+//                                          Nonce: 8
+//                                          Gas price: 1000000000
+//                                          Gas limit: 215352
+//                                          To: 0xa276B436e35a76E96Bd47aDF2ec6e055433c76E2
+//                                          Value: 0
+//                                          Data: 0x0e35f95a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000a2740000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002e516d524661416a703744624a625235674357716933595550316a326d746d6b523579636164476a33387a413558670000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013323032312d30342d30322030303a32363a3037000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003646f630000000000000000000000000000000000000000000000000000000000
+//                                          v: 44
+//                                          r: 7574277574799132992794004946874512288298215552507783879242588293639620668450
+//                                          s: 18980064760772690692073485455370694255269313616131795825427837027448019977656
+//                                          Intrinsic chainID: Optional(4)
+//                                          Infered chainID: Optional(4)
+//                                          sender: Optional("0xb007c5a9AE516Fde594D1EB1240068C32Bfa6669")
+//                                          hash: Optional("0x8317aff9aa3937e188869b2a0d73e61fc644821127bc49be97024ce9d0246150")
+//                                          , hash: "0x8317aff9aa3937e188869b2a0d73e61fc644821127bc49be97024ce9d0246150")
+
+//path QmTiziYRGbboLu8MgKoqdUb6YPaqcjNdSPGYfC8hegkXXB
+//size 122659
+//result from send TransactionSendingResult(transaction: Transaction
+//                                          Nonce: 7
+//                                          Gas price: 1000000000
+//                                          Gas limit: 215364
+//                                          To: 0xa276B436e35a76E96Bd47aDF2ec6e055433c76E2
+//                                          Value: 0
+//                                          Data: 0x0e35f95a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000001df230000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002e516d54697a6959524762626f4c75384d674b6f716455623659506171636a4e64535047596643386865676b5858420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013323032312d30342d30322030303a32323a31380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000037069630000000000000000000000000000000000000000000000000000000000
+//                                          v: 44
+//                                          r: 91055262493689418372330695502260511544052726525900338040982716471224311363683
+//                                          s: 54463489728768820357537306614686117396227094691913088853915925520198575702571
+//                                          Intrinsic chainID: Optional(4)
+//                                          Infered chainID: Optional(4)
+//                                          sender: Optional("0xb007c5a9AE516Fde594D1EB1240068C32Bfa6669")
+//                                          hash: Optional("0xd279725747f8fd2dbdda69732c1745f34add35d40a5baae89153409f031791be")
+//                                          , hash: "0xd279725747f8fd2dbdda69732c1745f34add35d40a5baae89153409f031791be")

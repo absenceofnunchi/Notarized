@@ -8,15 +8,13 @@
 import Foundation
 
 struct TxModel {
-    let gasPrice: String
-    let gasLimit: String
-    let toAddress: String
-    let value: String
+    let transactionHash: String
+    let fileHash: String?
     let date: Date
-    let nonce: String
     
     static func fromCoreData(crModel: TransactionModel) -> TxModel {
-        let tx = TxModel(gasPrice: crModel.gasPrice!, gasLimit: crModel.gasLimit!, toAddress: crModel.toAddress!, value: crModel.value!, date: crModel.date!, nonce: crModel.nonce!)
+//        guard let transactionHash = crModel.transactionHash, let date = crModel.date else { return nil }
+        let tx = TxModel(transactionHash: crModel.transactionHash!, fileHash: crModel.fileHash, date: crModel.date!)
         return tx
     }
 }

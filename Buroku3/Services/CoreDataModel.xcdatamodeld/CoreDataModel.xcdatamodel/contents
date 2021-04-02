@@ -8,14 +8,11 @@
     </entity>
     <entity name="TransactionModel" representedClassName="TransactionModel" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="gasLimit" optional="YES" attributeType="String"/>
-        <attribute name="gasPrice" optional="YES" attributeType="String"/>
-        <attribute name="nonce" optional="YES" attributeType="String"/>
-        <attribute name="toAddress" optional="YES" attributeType="String"/>
-        <attribute name="value" optional="YES" attributeType="String"/>
+        <attribute name="fileHash" optional="YES" attributeType="String"/>
+        <attribute name="transactionHash" optional="YES" attributeType="String"/>
     </entity>
     <elements>
         <element name="KeyWallet" positionX="-63" positionY="-18" width="128" height="89"/>
-        <element name="TransactionModel" positionX="-54" positionY="18" width="128" height="119"/>
+        <element name="TransactionModel" positionX="-54" positionY="18" width="128" height="74"/>
     </elements>
 </model>

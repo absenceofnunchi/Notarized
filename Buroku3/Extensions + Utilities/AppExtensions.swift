@@ -113,3 +113,63 @@ extension Data{
         }
     }
 }
+
+
+// MARK: - UIViewController
+
+extension UIViewController {
+    func activityStartAnimating(activityColor: UIColor, backgroundColor: UIColor) {
+        let backgroundView = UIView()
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundView.backgroundColor = backgroundColor
+        backgroundView.tag = 5000
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(activityIndicatorTapped))
+        backgroundView.addGestureRecognizer(tap)
+        
+        var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
+        activityIndicator = UIActivityIndicatorView(frame: CGRect.init(x: 0, y: 0, width: 50, height: 50))
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = .large
+        activityIndicator.color = activityColor
+        activityIndicator.startAnimating()
+        activityIndicator.tag = 5000
+        
+        backgroundView.addSubview(activityIndicator)
+        self.view.addSubview(backgroundView)
+        
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            // background view
+            backgroundView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            backgroundView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            backgroundView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            backgroundView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            backgroundView.widthAnchor.constraint(equalTo: self.view.widthAnchor),
+            backgroundView.heightAnchor.constraint(equalTo: self.view.heightAnchor),
+            
+            // activity indicator
+            activityIndicator.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: self.view.centerYAnchor)
+        ])
+    }
+    
+    func activityStopAnimating() {
+        DispatchQueue.main.async {
+            if let background = self.view.viewWithTag(5000) {
+                background.removeFromSuperview()
+            }
+        }
+    }
+    
+    @objc func activityIndicatorTapped() {
+        DispatchQueue.main.async {
+            if let background = self.view.viewWithTag(5000) {
+                background.removeFromSuperview()
+                if let navController = self as? UINavigationController {
+                    navController.popViewController(animated: true)
+                }
+            }
+        }
+    }
+}

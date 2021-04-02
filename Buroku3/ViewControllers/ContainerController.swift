@@ -30,6 +30,7 @@ extension ContainerViewController {
     
     // MARK: - Configure UI
     func configureUI() {
+        
         // configure navigation bar
         let navBar = self.navigationController?.navigationBar
         navBar?.standardAppearance.backgroundColor = UIColor.clear

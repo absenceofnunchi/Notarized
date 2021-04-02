@@ -330,42 +330,40 @@ extension SendViewController: UITextFieldDelegate {
                             DispatchQueue.global().async {
                                 do {
                                     let result = try transaction.send(password: password, transactionOptions: nil)
-                                    let tran = result.transaction
-
-                                    let txModel = TxModel(gasPrice: tran.gasPrice.description, gasLimit: tran.gasLimit.description, toAddress: tran.to.address, value: tran.value!.description, date: Date(), nonce: tran.nonce.description)
                                     
-                                    self?.localDatabase.saveTransactionDetail(result: txModel) { (error) in
-                                        if let error = error {
-                                            print("error save tx", error)
-                                        }
-                                        
-                                        DispatchQueue.main.async {
-                                            let finalAC = UIAlertController(title: "Success!", message: "Your ether has been sent.", preferredStyle: .alert)
-                                            finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
-                                                self?.dismiss(animated: true, completion: nil)
-                                            }))
-                                            self?.present(finalAC, animated: true, completion: nil)
-                                        }
+                                    self?.localDatabase.saveTransactionDetail(txHash: result.hash, date: Date())
+
+                                    DispatchQueue.main.async {
+                                        let finalAC = UIAlertController(title: "Success!", message: "Your ether has been sent.", preferredStyle: .alert)
+                                        finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
+                                            self?.dismiss(animated: true, completion: nil)
+                                        }))
+                                        self?.present(finalAC, animated: true, completion: nil)
                                     }
-//                                    print("Int64(gpStr )", Int64(gpStr ?? ""))
-//                                    print("hashString", String(data: hashData, encoding: .utf8))
-//                                    if let gpInt = Int64(gpStr ?? ""), let glInt = Int64(glStr ?? ""), let valueInt = Int64(valueStr ?? ""), let nonceInt = Int64(nonceStr ?? ""), let hashString = String(data: hashData, encoding: .utf8) {
-//                                        let txModel = TxModel(gasPrice: gpInt, gasLimit: glInt, toAddress: tran.to.address, value: valueInt, date: Date().description(with: .current), hashString: hashString, nonce: nonceInt)
-//
-//                                        self?.localDatabase.saveTransactionDetail(result: txModel) { (error) in
-//                                            if let error = error {
-//                                                print("error save tx", error)
-//                                            }
-//
-//                                            DispatchQueue.main.async {
-//                                                let finalAC = UIAlertController(title: "Success!", message: "Your ether has been sent.", preferredStyle: .alert)
-//                                                finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
-//                                                    self?.dismiss(animated: true, completion: nil)
-//                                                }))
-//                                                self?.present(finalAC, animated: true, completion: nil)
-//                                            }
+                                    
+//                                    let txModel = TxModel(gasPrice: tran.gasPrice.description, gasLimit: tran.gasLimit.description, toAddress: tran.to.address, value: tran.value!.description, date: Date(), nonce: tran.nonce.description)
+//                                    
+//                                    self?.localDatabase.saveTransactionDetail(result: txModel) { (error) in
+//                                        if let error = error {
+//                                            print("error save tx", error)
+//                                        }
+//                                        
+//                                        DispatchQueue.main.async {
+//                                            let finalAC = UIAlertController(title: "Success!", message: "Your ether has been sent.", preferredStyle: .alert)
+//                                            finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
+//                                                self?.dismiss(animated: true, completion: nil)
+//                                            }))
+//                                            self?.present(finalAC, animated: true, completion: nil)
 //                                        }
 //                                    }
+                                } catch Web3Error.nodeError(let desc) {
+                                    if let index = desc.firstIndex(of: ":") {
+                                        let newIndex = desc.index(after: index)
+                                        let newStr = desc[newIndex...]
+                                        DispatchQueue.main.async {
+                                            self?.alert.show("Alert", with: String(newStr), for: self!)
+                                        }
+                                    }
                                 } catch {
                                     DispatchQueue.main.async {
                                         self?.alert.show("Error", with: "Sorry, there was an error sending your ether. Please try again.", for: self!)

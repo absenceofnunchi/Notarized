@@ -7,12 +7,13 @@
 
 import UIKit
 import BigInt
+import web3swift
 
 struct BlockchainData {
-    let hash: String
-    let date: String
-    let size: String
     let name: String
+    let hash: String
+    let size: String
+    let date: String
 }
 
 class FilesViewController: UIViewController {
@@ -23,26 +24,12 @@ class FilesViewController: UIViewController {
     var pullControl: UIRefreshControl!
     var searchController: UISearchController!
     var searchResultsController: SearchResultsController!
-
-    // MARK: - init
-    init() {
-        super.init(nibName: nil, bundle: nil)
-//        tableView = UITableView()
-//        tableView.translatesAutoresizingMaskIntoConstraints = false
-//        view.addSubview(tableView)
-//        tableView.fill()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     override func loadView() {
         super.loadView()
         tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
-        tableView.fill()
     }
     
     // MARK: - vidDidLoad
@@ -61,16 +48,26 @@ class FilesViewController: UIViewController {
 extension FilesViewController {
     // MARK: - fetchData
     func fetchData() {
-        transaction.prepareTransactionForFiles(method: "getAllFiles") { [weak self] (transaction, error) in
-            if let error = error {
-                print("getAllFiles error", error)
-            }
 
+        self.activityStartAnimating(activityColor: UIColor.darkGray, backgroundColor: UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.5))
+        transaction.prepareTransactionForFiles(method: "getAllFiles") { [weak self] (transaction, error) in
+            if let _ = error {
+                DispatchQueue.main.async {
+                    self?.alert.show("Error", with: "There was an error preparing to fetch data from the blockchain.", for: self!) {
+                        DispatchQueue.main.async {
+                            self?.activityStopAnimating()
+                        }
+                    }
+                }
+            }
+            
             if let transaction = transaction {
                 DispatchQueue.global().async {
                     do {
                         let results = try transaction.call()
-                                                
+                        
+                        print("results", results)
+                        
                         for (_, value) in results {
                             let valueObject = (value as! [[Any]])
                             
@@ -80,17 +77,35 @@ extension FilesViewController {
                                    let name = vo[5] as? String,
                                    let size = vo[4] as? BigUInt {
                                     let sizeString = String(size)
-                                    let bd = BlockchainData(hash: hash, date: date, size: sizeString, name: name)
-                                    print("bd", bd)
+                                    let bd = BlockchainData(name: name, hash: hash, size: sizeString, date: date)
                                     self?.data.append(bd)
                                 }
                             }
                         }
                         DispatchQueue.main.async {
+                            self?.activityStopAnimating()
                             self?.tableView.reloadData()
                         }
+                    } catch Web3Error.nodeError(let desc) {
+                        if let index = desc.firstIndex(of: ":") {
+                            let newIndex = desc.index(after: index)
+                            let newStr = desc[newIndex...]
+                            DispatchQueue.main.async {
+                                self?.alert.show("Alert", with: String(newStr), for: self!, completion: {
+                                    DispatchQueue.main.async {
+                                        self?.activityStopAnimating()
+                                    }
+                                })
+                            }
+                        }
                     } catch {
-                        self?.alert.show("Error", with: "There was an error retrieving data from the blockchain.", for: self!)
+                        DispatchQueue.main.async {
+                            self?.alert.show("Error", with: "There was an error fetching data from the blockchain", for: self!, completion: {
+                                DispatchQueue.main.async {
+                                    self?.activityStopAnimating()
+                                }
+                            })
+                        }
                     }
                 }
             }
@@ -99,9 +114,13 @@ extension FilesViewController {
     
     // MARK: - configureUI
     func configureUI() {
-        self.navigationController?.navigationBar.prefersLargeTitles = true
+        edgesForExtendedLayout = .all
+        extendedLayoutIncludesOpaqueBars = true
+        
+        // navigation controller
         self.navigationController?.navigationBar.tintColor = UIColor.white
         self.navigationController?.navigationBar.isTranslucent = false
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         
         if #available(iOS 13.0, *) {
             let appearance = UINavigationBarAppearance()
@@ -128,14 +147,18 @@ extension FilesViewController {
         self.navigationController?.navigationBar.layer.shadowOffset = CGSize(width: 0, height: 2)
         self.navigationController?.navigationBar.layer.shadowRadius = 5
         self.navigationController?.navigationBar.layer.shadowOpacity = 0.7
+        
+        // title
+        title = "Uploaded List"
     }
     
     // MARK: - setConstraints
     func setConstraints() {
         NSLayoutConstraint.activate([
-//            tableView.widthAnchor.constraint(equalTo: view.widthAnchor),
-//            tableView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.7),
-//            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 }
@@ -146,12 +169,12 @@ extension FilesViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(FilesTableViewCell.self, forCellReuseIdentifier: Cell.filesCell)
-        tableView.rowHeight = 200
+        tableView.rowHeight = 140
         tableView.separatorStyle = .none
         
         // refresh
         pullControl = UIRefreshControl()
-        pullControl.attributedTitle = NSAttributedString(string: "Pull down to refresh")
+        pullControl.tintColor = .clear
         pullControl.addTarget(self, action: #selector(refreshFetch), for: .valueChanged)
         tableView.refreshControl = pullControl
         tableView.addSubview(pullControl)
@@ -175,13 +198,21 @@ extension FilesViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let datum = data[indexPath.row]
+        let fdvc = FileDetailViewController(data: datum)
+        self.navigationController?.pushViewController(fdvc, animated: true)
+    }
+    
     @objc func refreshFetch() {
         
         data.removeAll()
         fetchData()
         
         delay(1.0) {
-            self.pullControl.endRefreshing()
+            DispatchQueue.main.async {
+                self.pullControl.endRefreshing()
+            }
         }
     }
     

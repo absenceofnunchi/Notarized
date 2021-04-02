@@ -215,7 +215,7 @@ extension SinglePageViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.delegate = self
         tableView.dataSource = self
         
-        if let transations = localDatabase.getTransactions() {
+        if let transations = localDatabase.getAllTransactionHashes() {
             data = transations
         }
     }
@@ -238,8 +238,7 @@ extension SinglePageViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cell.activityCell, for: indexPath)
-        let transaction = data[indexPath.row]
-        cell.textLabel?.text = transaction.gasLimit
+//        let transaction = data[indexPath.row]
         
         return cell
     }
