@@ -8,17 +8,19 @@
 import UIKit
 import BigInt
 import web3swift
+import CoreSpotlight
 
 struct BlockchainData {
     let name: String
     let hash: String
     let size: String
     let date: String
+    let index: Int
 }
 
 class FilesViewController: UIViewController {
     var tableView: UITableView!
-    let transaction = TransactionService()
+    let transactionService = TransactionService()
     var data = [BlockchainData]()
     let alert = Alerts()
     var pullControl: UIRefreshControl!
@@ -48,19 +50,25 @@ class FilesViewController: UIViewController {
 extension FilesViewController {
     // MARK: - fetchData
     func fetchData() {
-
         self.activityStartAnimating(activityColor: UIColor.darkGray, backgroundColor: UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.5))
-        transaction.prepareTransactionForFiles(method: "getAllFiles") { [weak self] (transaction, error) in
-            if let _ = error {
-                DispatchQueue.main.async {
-                    self?.alert.show("Error", with: "There was an error preparing to fetch data from the blockchain.", for: self!) {
+        transactionService.prepareTransactionForFiles(method: "getAllFiles") { [weak self] (transaction, error) in
+            if let error = error {
+                self?.activityStopAnimating()
+                switch error {
+                    case .noAvailableKeys:
+                        self?.alert.show("No Wallet", with: "Please create or import your wallet first.", for: self!)
+                        break
+                    default:
                         DispatchQueue.main.async {
-                            self?.activityStopAnimating()
+                            self?.alert.show("Error", with: "There was an error preparing to fetch data from the blockchain.", for: self!) {
+                                DispatchQueue.main.async {
+                                    self?.activityStopAnimating()
+                                }
+                            }
                         }
-                    }
                 }
             }
-            
+                        
             if let transaction = transaction {
                 DispatchQueue.global().async {
                     do {
@@ -70,14 +78,17 @@ extension FilesViewController {
                         
                         for (_, value) in results {
                             let valueObject = (value as! [[Any]])
+                            self?.data.removeAll()
                             
                             for vo in valueObject {
                                 if let hash = vo[0] as? String,
                                    let date = vo[1] as? String,
+                                   let indexBigInt = vo[3] as? BigUInt,
                                    let name = vo[5] as? String,
                                    let size = vo[4] as? BigUInt {
                                     let sizeString = String(size)
-                                    let bd = BlockchainData(name: name, hash: hash, size: sizeString, date: date)
+                                    let index = Int(indexBigInt)
+                                    let bd = BlockchainData(name: name, hash: hash, size: sizeString, date: date, index: index)
                                     self?.data.append(bd)
                                 }
                             }
@@ -114,7 +125,8 @@ extension FilesViewController {
     
     // MARK: - configureUI
     func configureUI() {
-        edgesForExtendedLayout = .all
+//        edgesForExtendedLayout = .all
+        edgesForExtendedLayout = .top
         extendedLayoutIncludesOpaqueBars = true
         
         // navigation controller
@@ -169,7 +181,7 @@ extension FilesViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(FilesTableViewCell.self, forCellReuseIdentifier: Cell.filesCell)
-        tableView.rowHeight = 140
+        tableView.rowHeight = 150
         tableView.separatorStyle = .none
         
         // refresh
@@ -206,7 +218,6 @@ extension FilesViewController: UITableViewDelegate, UITableViewDataSource {
     
     @objc func refreshFetch() {
         
-        data.removeAll()
         fetchData()
         
         delay(1.0) {
@@ -263,5 +274,72 @@ extension FilesViewController: UISearchBarDelegate, UISearchControllerDelegate {
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         updateSearchResults(for: searchController)
+    }
+}
+
+// MARK: - Trailing action
+extension FilesViewController: UITextFieldDelegate {
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (contextualAction, view, boolValue) in
+            self?.alert.withPassword(title: "Delete File", delegate: self!, controller: self!, completion: { (password) in
+                if let file = self?.data[indexPath.row] {
+                    self?.deleteAction(for: file, password: password)
+                }
+            })
+        }
+        deleteAction.backgroundColor = .red
+        
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        return configuration
+    }
+    
+    func deleteAction(for file: BlockchainData, password: String) {
+        transactionService.prepareTransactionForDeletingFiles(method: "deleteFile", parameters: [file.index] as [AnyObject]) { [weak self](transaction, error) in
+            if let error = error {
+                switch error {
+                    case .contractLoadingError:
+                        self?.alert.show("Error", with: "There was an error loading a contract. Please try again.", for: self!)
+                    case .createTransactionIssue:
+                        self?.alert.show("Error", with: "There was an error creating your transaction. Please try again.", for: self!)
+                    case .insufficientFund:
+                        self?.alert.show("Error", with: "Insufficient fund", for: self!)
+                    default:
+                        self?.alert.show("Error", with: "Please try again.", for: self!)
+                }
+            }
+
+            if let transaction = transaction {
+                DispatchQueue.global().async {
+                    do {
+                        let result = try transaction.send(password: password, transactionOptions: nil)
+                        print("deleted result", result)
+                        DispatchQueue.main.async {
+                            self?.tableView.reloadData()
+                        }
+
+                        CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: ["\(file.hash)"]) { (error) in
+                            if let error = error {
+                                print("Deindexing error: \(error.localizedDescription)")
+                            } else {
+                                print("File successfully deindexed")
+                            }
+                        }
+                    } catch Web3Error.nodeError(let desc) {
+                        if let index = desc.firstIndex(of: ":") {
+                            let newIndex = desc.index(after: index)
+                            let newStr = desc[newIndex...]
+                            DispatchQueue.main.async {
+                                self?.alert.show("Alert", with: String(newStr), for: self!)
+                            }
+                        }
+                    } catch {
+                        DispatchQueue.main.async {
+                            self?.alert.show("Error", with: "Sorry, there was an error deleting your file. Please verify that your password is correct or you have enough Ether in your wallet.", for: self!)
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 //  TransactionModel+CoreDataClass.swift
 //  Buroku3
 //
-//  Created by J C on 2021-04-01.
+//  Created by J C on 2021-04-05.
 //
 //
 

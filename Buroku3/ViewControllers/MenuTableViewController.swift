@@ -9,15 +9,13 @@ import UIKit
 
 class MenuTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var customTableView: UITableView!
-//    let allMenu: [Menu] = [
-//        Menu(symbol: UIImage(systemName: "paperplane")!.withRenderingMode(.alwaysOriginal), title: "Upload Files"),
-//        Menu(symbol: UIImage(systemName: "square.stack.3d.up")!.withRenderingMode(.alwaysOriginal), title: "Browse Your Files"),
-//        Menu(symbol: UIImage(systemName: "wallet.pass")!.withRenderingMode(.alwaysOriginal), title: "Wallet")
-    //    ]
     let allMenu: [Menu] = [
-        Menu(symbol: UIImage(systemName: "trash")!.withRenderingMode(.alwaysOriginal), title: "Upload Files"),
-        Menu(symbol: UIImage(systemName: "trash")!.withRenderingMode(.alwaysOriginal), title: "Browse Your Files"),
-        Menu(symbol: UIImage(systemName: "trash")!.withRenderingMode(.alwaysOriginal), title: "Wallet")
+        Menu(symbol: UIImage(systemName: "paperplane")!.withRenderingMode(.alwaysOriginal), title: "Upload Files"),
+        Menu(symbol: UIImage(systemName: "square.stack.3d.up")!.withRenderingMode(.alwaysOriginal), title: "Files on Blockchain"),
+        Menu(symbol: UIImage(systemName: "creditcard")!.withRenderingMode(.alwaysOriginal), title: "Wallet"),
+        Menu(symbol: UIImage(systemName: "eye")!.withRenderingMode(.alwaysOriginal), title: "View on Etherscan"),
+        Menu(symbol: UIImage(systemName: "list.bullet")!.withRenderingMode(.alwaysOriginal), title: "Transaction History"),
+        Menu(symbol: UIImage(systemName: "cart")!.withRenderingMode(.alwaysOriginal), title: "Premium")
     ]
     var didTapMenuType: ((MenuType) -> Void)?
     weak var delegate: ContainerDelegate?
@@ -38,6 +36,7 @@ class MenuTableViewController: UIViewController, UITableViewDelegate, UITableVie
         
         customTableView.delegate = self
         customTableView.dataSource = self
+
     }
     
     // MARK: - Table view data source
@@ -48,7 +47,7 @@ class MenuTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 3
+        return 6
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -62,7 +61,12 @@ class MenuTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let menuType = MenuType(rawValue: indexPath.row) else { return }
-        
         delegate?.didSelectVC(menuType)
+        
+//        if indexPath.row >= 0 && indexPath.row < 5 {
+//
+//        } else {
+//            delegate?.didSelectETCMenu(indexPath.row)
+//        }
     }
 }

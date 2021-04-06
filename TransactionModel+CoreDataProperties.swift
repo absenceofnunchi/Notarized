@@ -2,7 +2,7 @@
 //  TransactionModel+CoreDataProperties.swift
 //  Buroku3
 //
-//  Created by J C on 2021-04-01.
+//  Created by J C on 2021-04-05.
 //
 //
 
@@ -19,6 +19,8 @@ extension TransactionModel {
     @NSManaged public var date: Date?
     @NSManaged public var fileHash: String?
     @NSManaged public var transactionHash: String?
+    @NSManaged public var walletAddress: String?
+    @NSManaged public var transactionType: String?
 
 }
 

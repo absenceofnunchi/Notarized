@@ -70,9 +70,11 @@ class TransactionService {
                                       gasLimit: UInt = 21000,
                                       completion:  @escaping (WriteTransaction?, SendEthErrors?) -> Void) {
         guard let address = Web3swiftService.currentAddress else { return }
-        let balance = try? Web3swiftService.web3instance.eth.getBalance(address: address)
+        var balance: BigUInt!
         
         DispatchQueue.global().async {
+            balance = try? Web3swiftService.web3instance.eth.getBalance(address: address)
+
             guard let destinationAddressString = destinationAddressString, !destinationAddressString.isEmpty else {
                 DispatchQueue.main.async {
                     completion(nil, SendEthErrors.emptyDestinationAddress)
@@ -143,29 +145,29 @@ class TransactionService {
     }
     
     // MARK: - prepareTransactionForNewContract
-    func prepareTransactionForNewContract(completion: @escaping (WriteTransaction?, Error?) -> Void) {
-        guard let address = Web3swiftService.currentAddress else { return }
-        var options = TransactionOptions.defaultOptions
-        options.from = address
-        options.gasLimit = TransactionOptions.GasLimitPolicy.automatic
-        options.gasPrice = TransactionOptions.GasPricePolicy.automatic
-        
-        let web3 = Web3swiftService.web3instance
-        guard let contract = web3.contract(accountABI) else {
-            DispatchQueue.main.async {
-                completion(nil, AccountContractErrors.contractLoadingError)
-            }
-            return
-        }
-        
-        let bytecode = Data(hex: accountBytecode)
-        guard let transaction = contract.deploy(bytecode: bytecode, parameters: [AnyObject](), extraData: Data(), transactionOptions: options) else {
-            DispatchQueue.main.async {
-                completion(nil, SendEthErrors.createTransactionIssue)
-            }
-            return
-        }
-            
+//    func prepareTransactionForNewContract(completion: @escaping (WriteTransaction?, Error?) -> Void) {
+//        guard let address = Web3swiftService.currentAddress else { return }
+//        var options = TransactionOptions.defaultOptions
+//        options.from = address
+//        options.gasLimit = TransactionOptions.GasLimitPolicy.automatic
+//        options.gasPrice = TransactionOptions.GasPricePolicy.automatic
+//
+//        let web3 = Web3swiftService.web3instance
+//        guard let contract = web3.contract(accountABI) else {
+//            DispatchQueue.main.async {
+//                completion(nil, AccountContractErrors.contractLoadingError)
+//            }
+//            return
+//        }
+//
+//        let bytecode = Data(hex: accountBytecode)
+//        guard let transaction = contract.deploy(bytecode: bytecode, parameters: [AnyObject](), extraData: Data(), transactionOptions: options) else {
+//            DispatchQueue.main.async {
+//                completion(nil, SendEthErrors.createTransactionIssue)
+//            }
+//            return
+//        }
+//            
 //            DispatchQueue.global().async {
 //                do {
 //                    let result = try transaction.send(password: "11111", transactionOptions: nil)
@@ -174,10 +176,10 @@ class TransactionService {
 //                    print("error from send", error)
 //                }
 //            }
-        DispatchQueue.main.async {
-            completion(transaction, nil)
-        }
-    }
+//        DispatchQueue.main.async {
+//            completion(transaction, nil)
+//        }
+//    }
         
     // MARK: - prepareTransactionFiles
     func prepareTransactionForSettingFile(parameters: [AnyObject], completion: @escaping (WriteTransaction?, SendEthErrors?) -> Void) {
@@ -208,8 +210,13 @@ class TransactionService {
     }
     
     // MARK: - prepareTransactionFiles
-    func prepareTransactionForFiles(method: String, parameters: [AnyObject] = [AnyObject](), completion: @escaping (WriteTransaction?, SendEthErrors?) -> Void) {
-        guard let address = Web3swiftService.currentAddress else { return }
+    func prepareTransactionForFiles(method: String, parameters: [AnyObject] = [AnyObject](), completion: @escaping (ReadTransaction?, SendEthErrors?) -> Void) {
+        guard let address = Web3swiftService.currentAddress else {
+            DispatchQueue.main.async {
+                completion(nil, SendEthErrors.noAvailableKeys)
+            }
+            return
+        }
         var options = TransactionOptions.defaultOptions
         options.from = address
         options.gasLimit = TransactionOptions.GasLimitPolicy.automatic
@@ -223,7 +230,7 @@ class TransactionService {
             return
         }
         
-        guard let transaction = contract.method(method, parameters: parameters, extraData: Data(), transactionOptions: options) else {
+        guard let transaction = contract.read(method, parameters: parameters, extraData: Data(), transactionOptions: options) else {
             DispatchQueue.main.async {
                 completion(nil, SendEthErrors.createTransactionIssue)
             }
@@ -232,6 +239,50 @@ class TransactionService {
         
         DispatchQueue.main.async {
             completion(transaction, nil)
+        }
+    }
+    
+    func prepareTransactionForDeletingFiles(method: String, parameters: [AnyObject] = [AnyObject](), completion: @escaping (WriteTransaction?, SendEthErrors?) -> Void) {
+        guard let address = Web3swiftService.currentAddress else { return }
+        var options = TransactionOptions.defaultOptions
+        options.from = address
+        options.gasLimit = TransactionOptions.GasLimitPolicy.automatic
+        options.gasPrice = TransactionOptions.GasPricePolicy.automatic
+        
+        DispatchQueue.global().async {
+            let web3 = Web3swiftService.web3instance
+            guard let contract = web3.contract(fileManagerABI, at: fileManagerContractAddress, abiVersion: 2) else {
+                DispatchQueue.main.async {
+                    completion(nil, SendEthErrors.contractLoadingError)
+                }
+                return
+            }
+            
+            guard let transaction = contract.write(method, parameters: parameters, extraData: Data(), transactionOptions: options) else {
+                DispatchQueue.main.async {
+                    completion(nil, SendEthErrors.createTransactionIssue)
+                }
+                return
+            }
+            
+            let balance = try? Web3swiftService.web3instance.eth.getBalance(address: address)
+            guard let gasPrice = try? Web3swiftService.web3instance.eth.getGasPrice() else {
+                DispatchQueue.main.async {
+                    completion(nil, SendEthErrors.retrievingGasPriceError)
+                }
+                return
+            }
+            
+            guard gasPrice < (BigUInt(balance ?? 0)) else {
+                DispatchQueue.main.async {
+                    completion(nil, SendEthErrors.insufficientFund)
+                }
+                return
+            }
+            
+            DispatchQueue.main.async {
+                completion(transaction, nil)
+            }
         }
     }
 }

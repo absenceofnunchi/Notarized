@@ -16,6 +16,9 @@ enum MenuType: Int {
     case browse
     case files
     case wallet
+    case etherscan
+    case transactionHistory
+    case premium
     
     var VCType: UIViewController.Type {
         switch self {
@@ -25,6 +28,12 @@ enum MenuType: Int {
                 return FilesViewController.self
             case .wallet:
                 return WalletViewController.self
+            case .etherscan:
+                return WebViewController.self
+            case .transactionHistory:
+                return TransactionHistoryViewController.self
+            case .premium:
+                return ParentViewController.self
         }
     }
 }

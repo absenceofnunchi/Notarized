@@ -73,13 +73,13 @@ extension FilesTableViewCell {
             nameLabel.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor),
 
             // hash label
-            hashLabel.topAnchor.constraint(equalTo: nameLabel.layoutMarginsGuide.bottomAnchor),
+            hashLabel.topAnchor.constraint(equalTo: nameLabel.layoutMarginsGuide.bottomAnchor, constant: 3),
             hashLabel.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor),
             hashLabel.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 1/5),
             hashLabel.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor),
 
             // size label
-            sizeLabel.topAnchor.constraint(equalTo: hashLabel.layoutMarginsGuide.bottomAnchor),
+            sizeLabel.topAnchor.constraint(equalTo: hashLabel.layoutMarginsGuide.bottomAnchor, constant: 3),
             sizeLabel.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor),
             sizeLabel.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 1/5),
             sizeLabel.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor),

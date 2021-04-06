@@ -113,6 +113,25 @@ class LocalDatabase {
         }
     }
     
+    func getAllTransactionHashes(walletAddress: String) -> [TxModel]? {
+        let requestTransaction: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
+        requestTransaction.predicate = NSPredicate(format: "walletAddress == %@", walletAddress)
+        let sort = NSSortDescriptor(key: "date", ascending: true)
+        requestTransaction.sortDescriptors = [sort]
+        
+        do {
+            let results = try mainContext.fetch(requestTransaction)
+            
+            let tx = results.map { result in
+                return TxModel.fromCoreData(crModel: result)
+            }
+            return tx
+        } catch {
+            print(error)
+            return nil
+        }
+    }
+    
     func getTransactionHash(fileHash: String) -> TxModel? {
         let requestTransaction: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
         requestTransaction.predicate = NSPredicate(format: "fileHash == %@", fileHash)
@@ -154,12 +173,14 @@ class LocalDatabase {
 //    }
     
     // for uploading files
-    func saveTransactionDetail(txHash: String, fileHash: String? = nil, date: Date) {
+    func saveTransactionDetail(walletAddress: String, txHash: String, fileHash: String? = nil, date: Date, txType: TransactionType) {
         container.performBackgroundTask { (context) in
             guard let entity = NSEntityDescription.insertNewObject(forEntityName: "TransactionModel", into: context) as? TransactionModel else { return }
+            entity.walletAddress = walletAddress
             entity.transactionHash = txHash
             entity.fileHash = fileHash
             entity.date = date
+            entity.transactionType = txType.rawValue
             
             do {
                 try context.save()

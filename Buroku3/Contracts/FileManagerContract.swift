@@ -8,249 +8,8 @@
 import Foundation
 import web3swift
 
-// MARK: - Account 
-let accountContractAddress = EthereumAddress("0x98e4fFd8fDAE6F6C0a5306d89F193065EDD185E2")
-let accountABI = """
-[
-{
-"inputs": [],
-"name": "deleteAllDocuments",
-"outputs": [],
-"stateMutability": "nonpayable",
-"type": "function"
-},
-{
-"inputs": [],
-"name": "deleteAllImages",
-"outputs": [],
-"stateMutability": "nonpayable",
-"type": "function"
-},
-{
-"inputs": [
-{
-"internalType": "uint256",
-"name": "_index",
-"type": "uint256"
-}
-],
-"name": "deleteDocument",
-"outputs": [],
-"stateMutability": "nonpayable",
-"type": "function"
-},
-{
-"inputs": [
-{
-"internalType": "uint256",
-"name": "_index",
-"type": "uint256"
-}
-],
-"name": "deleteImage",
-"outputs": [],
-"stateMutability": "nonpayable",
-"type": "function"
-},
-{
-"inputs": [
-{
-"internalType": "string",
-"name": "_ipfsHash",
-"type": "string"
-},
-{
-"internalType": "string",
-"name": "date",
-"type": "string"
-}
-],
-"name": "setDocument",
-"outputs": [],
-"stateMutability": "nonpayable",
-"type": "function"
-},
-{
-"inputs": [
-{
-"internalType": "string",
-"name": "_ipfsHash",
-"type": "string"
-},
-{
-"internalType": "string",
-"name": "date",
-"type": "string"
-}
-],
-"name": "setImage",
-"outputs": [],
-"stateMutability": "nonpayable",
-"type": "function"
-},
-{
-"inputs": [],
-"stateMutability": "nonpayable",
-"type": "constructor"
-},
-{
-"inputs": [
-{
-"internalType": "uint256",
-"name": "_index",
-"type": "uint256"
-}
-],
-"name": "getDocument",
-"outputs": [
-{
-"components": [
-{
-"internalType": "string",
-"name": "ipfsHash",
-"type": "string"
-},
-{
-"internalType": "string",
-"name": "date",
-"type": "string"
-},
-{
-"internalType": "bool",
-"name": "isActive",
-"type": "bool"
-},
-{
-"internalType": "uint256",
-"name": "index",
-"type": "uint256"
-}
-],
-"internalType": "struct Account.Document",
-"name": "",
-"type": "tuple"
-}
-],
-"stateMutability": "view",
-"type": "function"
-},
-{
-"inputs": [],
-"name": "getDocuments",
-"outputs": [
-{
-"components": [
-{
-"internalType": "string",
-"name": "ipfsHash",
-"type": "string"
-},
-{
-"internalType": "string",
-"name": "date",
-"type": "string"
-},
-{
-"internalType": "bool",
-"name": "isActive",
-"type": "bool"
-},
-{
-"internalType": "uint256",
-"name": "index",
-"type": "uint256"
-}
-],
-"internalType": "struct Account.Document[]",
-"name": "",
-"type": "tuple[]"
-}
-],
-"stateMutability": "view",
-"type": "function"
-},
-{
-"inputs": [
-{
-"internalType": "uint256",
-"name": "_index",
-"type": "uint256"
-}
-],
-"name": "getImage",
-"outputs": [
-{
-"components": [
-{
-"internalType": "string",
-"name": "ipfsHash",
-"type": "string"
-},
-{
-"internalType": "string",
-"name": "date",
-"type": "string"
-},
-{
-"internalType": "bool",
-"name": "isActive",
-"type": "bool"
-},
-{
-"internalType": "uint256",
-"name": "index",
-"type": "uint256"
-}
-],
-"internalType": "struct Account.Image",
-"name": "",
-"type": "tuple"
-}
-],
-"stateMutability": "view",
-"type": "function"
-},
-{
-"inputs": [],
-"name": "getImages",
-"outputs": [
-{
-"components": [
-{
-"internalType": "string",
-"name": "ipfsHash",
-"type": "string"
-},
-{
-"internalType": "string",
-"name": "date",
-"type": "string"
-},
-{
-"internalType": "bool",
-"name": "isActive",
-"type": "bool"
-},
-{
-"internalType": "uint256",
-"name": "index",
-"type": "uint256"
-}
-],
-"internalType": "struct Account.Image[]",
-"name": "",
-"type": "tuple[]"
-}
-],
-"stateMutability": "view",
-"type": "function"
-}
-]
-"""
-
-// MARK: - File manager
-
-let fileManagerContractAddress = EthereumAddress("0xa276B436e35a76E96Bd47aDF2ec6e055433c76E2")
+// MARK: - FileManager
+let fileManagerContractAddress = EthereumAddress("0x01F4f8E268f278C9e4DB60B7d4Ff83a367d35697")
 let fileManagerABI = """
 [
     {
@@ -491,3 +250,60 @@ let accountBytecode = """
 //"sourceMap": "144:3832:0:-:0;;;373:1;355:19;;574:1;553:22;;588:51;;;;;;;;;;621:10;613:5;;:18;;;;;;;;;;;;;;;;;;144:3832;;;;;;"
 //}
 //"""
+
+
+//Deploying 'FileManager'
+//    -----------------------
+//    > transaction hash:    0x919f2b5ddf93d598a1ae1cfdd2ee854872252ed99a8d8d94ce28d04d1faf5fff
+//> Blocks: 1            Seconds: 12
+//> contract address:    0x01F4f8E268f278C9e4DB60B7d4Ff83a367d35697
+//> block number:        8354999
+//> block timestamp:     1617558610
+//> account:             0x9Ce24C07AaB108283b3518c6801c6E757b0C514C
+//> balance:             6.501846625
+//> gas used:            1758799 (0x1ad64f)
+//> gas price:           10 gwei
+//> value sent:          0 ETH
+//> total cost:          0.01758799 ETH
+
+
+//path QmRFaAjp7DbJbR5gCWqi3YUP1j2mtmkR5ycadGj38zA5Xg
+//size 41588
+//result from send TransactionSendingResult(transaction: Transaction
+//                                          Nonce: 8
+//                                          Gas price: 1000000000
+//                                          Gas limit: 215352
+//                                          To: 0xa276B436e35a76E96Bd47aDF2ec6e055433c76E2
+//                                          Value: 0
+//                                          Data: 0x0e35f95a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000a2740000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002e516d524661416a703744624a625235674357716933595550316a326d746d6b523579636164476a33387a413558670000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013323032312d30342d30322030303a32363a3037000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003646f630000000000000000000000000000000000000000000000000000000000
+//                                          v: 44
+//                                          r: 7574277574799132992794004946874512288298215552507783879242588293639620668450
+//                                          s: 18980064760772690692073485455370694255269313616131795825427837027448019977656
+//                                          Intrinsic chainID: Optional(4)
+//                                          Infered chainID: Optional(4)
+//                                          sender: Optional("0xb007c5a9AE516Fde594D1EB1240068C32Bfa6669")
+//                                          hash: Optional("0x8317aff9aa3937e188869b2a0d73e61fc644821127bc49be97024ce9d0246150")
+//                                          , hash: "0x8317aff9aa3937e188869b2a0d73e61fc644821127bc49be97024ce9d0246150")
+
+//path QmTiziYRGbboLu8MgKoqdUb6YPaqcjNdSPGYfC8hegkXXB
+//size 122659
+//result from send TransactionSendingResult(transaction: Transaction
+//                                          Nonce: 7
+//                                          Gas price: 1000000000
+//                                          Gas limit: 215364
+//                                          To: 0xa276B436e35a76E96Bd47aDF2ec6e055433c76E2
+//                                          Value: 0
+//                                          Data: 0x0e35f95a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000001df230000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002e516d54697a6959524762626f4c75384d674b6f716455623659506171636a4e64535047596643386865676b5858420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013323032312d30342d30322030303a32323a31380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000037069630000000000000000000000000000000000000000000000000000000000
+//                                          v: 44
+//                                          r: 91055262493689418372330695502260511544052726525900338040982716471224311363683
+//                                          s: 54463489728768820357537306614686117396227094691913088853915925520198575702571
+//                                          Intrinsic chainID: Optional(4)
+//                                          Infered chainID: Optional(4)
+//                                          sender: Optional("0xb007c5a9AE516Fde594D1EB1240068C32Bfa6669")
+//                                          hash: Optional("0xd279725747f8fd2dbdda69732c1745f34add35d40a5baae89153409f031791be")
+//                                          , hash: "0xd279725747f8fd2dbdda69732c1745f34add35d40a5baae89153409f031791be")
+
+
+
+// private key d148f77901fa743b57fd10a0415bb5b5375309b87dc31578846b63fb855c2e47
+// 94853b85a808220053f0fecb17d7ac1c004e93ed390ae1d6e9f7f45f2422bf5c

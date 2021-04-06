@@ -125,7 +125,7 @@ extension SendViewController {
         destinationTextField.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(destinationTextField)
         
-        guard let scanButtonImage = UIImage(systemName: "barcode.viewfinder") else { return }
+        guard let scanButtonImage = UIImage(systemName: "qrcode.viewfinder") else { return }
         scanButton = UIButton.systemButton(with: scanButtonImage.withTintColor(.white, renderingMode: .alwaysOriginal), target: self, action: #selector(buttonHandler(_:)))
         scanButton.backgroundColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
         scanButton.transform = CGAffineTransform(translationX: 0, y: 40)
@@ -295,44 +295,38 @@ extension SendViewController: UITextFieldDelegate {
                     }
                 }
             case 4:
-                transactionService.prepareTransactionForSending(destinationAddressString: destinationTextField.text, amountString: amountTextField.text) { (transaction, error) in
+                transactionService.prepareTransactionForSending(destinationAddressString: destinationTextField.text, amountString: amountTextField.text) { [weak self](transaction, error) in
                     if let error = error {
                         switch error {
                             case .invalidDestinationAddress:
-                                self.alert.show("Error", with: "Invalid destination address", for: self)
+                                self?.alert.show("Error", with: "Invalid destination address", for: self!)
                             case .invalidAmountFormat:
-                                self.alert.show("Error", with: "Invalid amount format", for: self)
+                                self?.alert.show("Error", with: "Invalid amount format", for: self!)
                             case .emptyDestinationAddress:
-                                self.alert.show("Error", with: "Destination address cannot be empty", for: self)
+                                self?.alert.show("Error", with: "Destination address cannot be empty", for: self!)
                             case .emptyAmount:
-                                self.alert.show("Error", with: "Amount cannot be empty", for: self)
+                                self?.alert.show("Error", with: "Amount cannot be empty", for: self!)
                             case .zeroAmount:
-                                self.alert.show("Error", with: "Amount cannot be zero or below", for: self)
+                                self?.alert.show("Error", with: "Amount cannot be zero or below", for: self!)
                             case .contractLoadingError:
-                                self.alert.show("Error", with: "There was an error loading a contract. Please try again.", for: self)
+                                self?.alert.show("Error", with: "There was an error loading a contract. Please try again.", for: self!)
                             case .createTransactionIssue:
-                                self.alert.show("Error", with: "There was an error creating your transaction. Please try again.", for: self)
+                                self?.alert.show("Error", with: "There was an error creating your transaction. Please try again.", for: self!)
                             case .insufficientFund:
-                                self.alert.show("Error", with: "Insufficient fund", for: self)
+                                self?.alert.show("Error", with: "Insufficient fund", for: self!)
                             default:
-                                self.alert.show("Error", with: "Please try again.", for: self)
+                                self?.alert.show("Error", with: "Please try again.", for: self!)
                         }
                     }
                     
                     if let transaction = transaction {
-                        let ac = UIAlertController(title: "Enter the password", message: nil, preferredStyle: .alert)
-                        ac.addTextField { (textField: UITextField!) in
-                            textField.delegate = self
-                        }
                         
-                        let enterAction = UIAlertAction(title: "Enter", style: .default) { [unowned ac, weak self](_) in
-                            guard let textField = ac.textFields?.first, let password = textField.text else { return }
+                        self?.alert.withPassword(title: "Send Ether", delegate: self!, controller: self!) { (password) in
                             DispatchQueue.global().async {
                                 do {
                                     let result = try transaction.send(password: password, transactionOptions: nil)
+                                    self?.localDatabase.saveTransactionDetail(walletAddress: Web3swiftService.currentAddressString!, txHash: result.hash, date: Date(), txType: .etherSent)
                                     
-                                    self?.localDatabase.saveTransactionDetail(txHash: result.hash, date: Date())
-
                                     DispatchQueue.main.async {
                                         let finalAC = UIAlertController(title: "Success!", message: "Your ether has been sent.", preferredStyle: .alert)
                                         finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
@@ -340,22 +334,6 @@ extension SendViewController: UITextFieldDelegate {
                                         }))
                                         self?.present(finalAC, animated: true, completion: nil)
                                     }
-                                    
-//                                    let txModel = TxModel(gasPrice: tran.gasPrice.description, gasLimit: tran.gasLimit.description, toAddress: tran.to.address, value: tran.value!.description, date: Date(), nonce: tran.nonce.description)
-//                                    
-//                                    self?.localDatabase.saveTransactionDetail(result: txModel) { (error) in
-//                                        if let error = error {
-//                                            print("error save tx", error)
-//                                        }
-//                                        
-//                                        DispatchQueue.main.async {
-//                                            let finalAC = UIAlertController(title: "Success!", message: "Your ether has been sent.", preferredStyle: .alert)
-//                                            finalAC.addAction(UIAlertAction(title: "OK", style: .default, handler: { (_) in
-//                                                self?.dismiss(animated: true, completion: nil)
-//                                            }))
-//                                            self?.present(finalAC, animated: true, completion: nil)
-//                                        }
-//                                    }
                                 } catch Web3Error.nodeError(let desc) {
                                     if let index = desc.firstIndex(of: ":") {
                                         let newIndex = desc.index(after: index)
@@ -371,12 +349,6 @@ extension SendViewController: UITextFieldDelegate {
                                 }
                             }
                         }
-                        
-                        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-                        
-                        ac.addAction(enterAction)
-                        ac.addAction(cancelAction)
-                        self.present(ac, animated: true, completion: nil)
                     }
                 }
             default:

@@ -14,5 +14,8 @@ struct Cell {
     static var fileDetailCell = "cellDetailCell"
     static var buttonCell = "buttonCell"
     static var etherscanButtonCell = "etherScanButtonCell"
+    static var txHistoryCell = "txHistoryCell"
+    static var purchasesCell = "purchasesCell"
+    static var priceCell = "priceCell"
 }
 

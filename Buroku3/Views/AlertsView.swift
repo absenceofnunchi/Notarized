@@ -55,6 +55,31 @@ class Alerts {
         
         ac.addAction(enterAction)
         ac.addAction(cancelAction)
-        controller.present(ac, animated: true, completion: nil)
+        DispatchQueue.main.async {
+            controller.present(ac, animated: true, completion: nil)
+        }
+    }
+    
+    func withPassword(title: String, delegate: UITextFieldDelegate, controller: UIViewController, completion: @escaping (String) -> Void) {
+        let ac = UIAlertController(title: title, message: "Enter the password of your wallet to authorize this transaction.", preferredStyle: .alert)
+
+        ac.addTextField { (textField: UITextField!) in
+            textField.delegate = delegate
+            textField.placeholder = "Password for your wallet"
+        }
+        
+        let enterAction = UIAlertAction(title: "Enter", style: .default) { [unowned ac](_) in
+            guard let textField = ac.textFields?.first, let password = textField.text else { return }
+            
+            completion(password)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        ac.addAction(enterAction)
+        ac.addAction(cancelAction)
+        DispatchQueue.main.async {
+            controller.present(ac, animated: true, completion: nil)
+        }
     }
 }

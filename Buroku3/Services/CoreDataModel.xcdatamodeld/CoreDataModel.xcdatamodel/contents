@@ -10,9 +10,11 @@
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="fileHash" optional="YES" attributeType="String"/>
         <attribute name="transactionHash" optional="YES" attributeType="String"/>
+        <attribute name="transactionType" optional="YES" attributeType="String"/>
+        <attribute name="walletAddress" optional="YES" attributeType="String"/>
     </entity>
     <elements>
         <element name="KeyWallet" positionX="-63" positionY="-18" width="128" height="89"/>
-        <element name="TransactionModel" positionX="-54" positionY="18" width="128" height="74"/>
+        <element name="TransactionModel" positionX="-54" positionY="18" width="128" height="104"/>
     </elements>
 </model>

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import StoreKit
 
 // MARK: - CGContext
 
@@ -171,5 +172,116 @@ extension UIViewController {
                 }
             }
         }
+    }
+}
+
+// MARK: - Section
+extension Section {
+    /// - returns: A Section object matching the specified name in the data array.
+    static func parse(_ data: [Section], for type: SectionType) -> Section? {
+        let section = (data.filter({ (item: Section) in item.type == type }))
+        return (!section.isEmpty) ? section.first : nil
+    }
+}
+
+// MARK: - SKProduct
+extension SKProduct {
+    /// - returns: The cost of the product formatted in the local currency.
+    var regularPrice: String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = self.priceLocale
+        return formatter.string(from: self.price)
+    }
+}
+
+// MARK: - SKDownload
+extension SKDownload {
+    /// - returns: A string representation of the downloadable content length.
+    var downloadContentSize: String {
+        return ByteCountFormatter.string(fromByteCount: self.expectedContentLength, countStyle: .file)
+    }
+}
+
+// MARK: - UIFont
+extension UIFont {
+    
+    static var title1: UIFont {
+        return UIFont.preferredFont(forTextStyle: .title1)
+    }
+    
+    static var body: UIFont {
+        return UIFont.preferredFont(forTextStyle: .body)
+    }
+    
+    static var subheadline: UIFont {
+        return UIFont.preferredFont(forTextStyle: .subheadline)
+    }
+    
+    static var caption: UIFont {
+        return UIFont.preferredFont(forTextStyle: .caption2)
+    }
+    
+    func with(weight: UIFont.Weight) -> UIFont {
+        return UIFont.systemFont(ofSize: pointSize, weight: weight)
+    }
+}
+
+// MARK: - EnableItem
+extension UIBarItem: EnableItem {
+    /// Enable the bar item.
+    func enable() {
+        self.isEnabled = true
+    }
+    
+    /// Disable the bar item.
+    func disable() {
+        self.isEnabled = false
+    }
+}
+
+// MARK: - ProductIdentifiers
+extension ProductIdentifiers {
+    var isEmpty: String {
+        return "\(key) from \(store) is empty. \(Messages.updateResource)"
+    }
+    
+    var wasNotFound: String {
+        return "\(Messages.couldNotFind) \(key) from \(store)."
+    }
+    
+    /// - returns: An array with the product identifiers to be queried.
+    var identifiers: [String]? {
+        let keyValStore = NSUbiquitousKeyValueStore.default
+        if let dict = keyValStore.array(forKey: key) as? [String] {
+            return dict
+        } else {
+            let productIDs = [ProductIDs.oneMonth.rawValue, ProductIDs.sixMonths.rawValue, ProductIDs.oneYear.rawValue]
+            keyValStore.set(productIDs, forKey: key)
+            if let dict = keyValStore.array(forKey: key) as? [String] {
+                return dict
+            } else {
+                return nil
+            }
+        }
+    }
+}
+
+// MARK: - DateFormatter
+extension DateFormatter {
+    /// - returns: A string representation of date using the short time and date style.
+    class func short(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: date)
+    }
+    
+    /// - returns: A string representation of date using the long time and date style.
+    class func long(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .long
+        dateFormatter.timeStyle = .long
+        return dateFormatter.string(from: date)
     }
 }

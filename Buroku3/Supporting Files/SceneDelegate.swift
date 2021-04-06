@@ -11,9 +11,22 @@ import CoreData
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    let localDatabase = LocalDatabase()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        let window = UIWindow(windowScene: windowScene)
+        window.backgroundColor = .white
+        if let _ = localDatabase.getWallet() {
+            let nav = UINavigationController(rootViewController: ContainerViewController())
+            window.rootViewController = nav
+        } else {
+            let walletVC = WalletViewController()
+            window.rootViewController = walletVC
+        }
+
+        window.makeKeyAndVisible()
+        self.window = window
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

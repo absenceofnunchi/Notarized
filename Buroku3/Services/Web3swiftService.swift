@@ -33,6 +33,14 @@ class Web3swiftService {
         return ethAddressFrom
     }
     
+    static var currentAddressString: String? {
+        let wallet = self.keyservice.selectedWallet()
+        guard let address = wallet?.address else {
+            return nil
+        }
+        return address
+    }
+    
     func isEthAddressValid(address: String) -> Bool {
         if EthereumAddress(address) != nil {
             return true

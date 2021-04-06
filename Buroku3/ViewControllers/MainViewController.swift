@@ -9,6 +9,8 @@ import UIKit
 import Lottie
 import QuickLook
 import web3swift
+import CoreSpotlight
+import MobileCoreServices
 
 class MainViewController: UIViewController {
     var backgroundView: BackgroundView7!
@@ -179,6 +181,7 @@ extension MainViewController: UIImagePickerControllerDelegate & UINavigationCont
         }
         
         alert.withTextField(delegate: self, controller: self, image: image) { [weak self] (title, password) in
+//            self?.uploadFile(fileData: image, title: title, password: password)
             self?.uploadImage(image: image, title: title, password: password)
         }
     }
@@ -186,8 +189,6 @@ extension MainViewController: UIImagePickerControllerDelegate & UINavigationCont
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
     }
-    
-
 }
 
 // MARK: - Document
@@ -217,10 +218,11 @@ extension MainViewController: QLPreviewControllerDataSource, QLPreviewController
             preview.dataSource = self
             preview.buttonAction = { [weak self] in
                 self?.dismiss(animated: true, completion: nil)
-                
+
                 if let data = retrievedData {
                     self?.alert.withTextField(delegate: self!, controller: self!, data: data, completion: { (title, password) in
-                        self?.uploadFile(fileData: data, title: title, password: password)
+//                        self?.uploadFile(fileData: data, title: title, password: password)
+                        self?.uploadData(data: data, title: title, password: password)
                     })
                 }
             }
@@ -235,13 +237,21 @@ extension MainViewController: UITextFieldDelegate {
         return "Boundary-\(Int.random(in: 1000 ... 9999))"
     }
     
-    func createBodyWithParameters(parameters: [String: String]?, filePathKey: String, imageDataKey: Data, boundary: String) -> Data {
+    func createBodyWithParameters(parameters: [String: String]?, filePathKey: String, dataKey: Data, boundary: String, isImage: Bool) -> Data {
         let body = NSMutableData()
-        let mimetype = "image/*"
+        
+        var mimetype: String!
+        
+        if isImage == true {
+            mimetype = "image/*"
+        } else {
+            mimetype = "application/*"
+        }
+        
         body.append("--\(boundary)\r\n".data(using: .utf8) ?? Data())
         body.append("Content-Disposition: form-data; name=\"\(filePathKey)\"; filename=\"\(filePathKey)\"\r\n".data(using: .utf8) ?? Data())
-        body.append("Content-Type: \(mimetype)\r\n\r\n".data(using: .utf8) ?? Data())
-        body.append(imageDataKey)
+        body.append("Content-Type: \(mimetype!)\r\n\r\n".data(using: .utf8) ?? Data())
+        body.append(dataKey)
         body.append("\r\n".data(using: .utf8) ?? Data())
         body.append("--\(boundary)--\r\n".data(using: .utf8) ?? Data())
         print("body", body)
@@ -263,8 +273,51 @@ extension MainViewController: UITextFieldDelegate {
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         // built data from img
         if let imageData = image.jpegData(compressionQuality: 0.8) {
-            request.httpBody = createBodyWithParameters(parameters: nil, filePathKey: "file", imageDataKey: imageData, boundary: boundary)
+            request.httpBody = createBodyWithParameters(parameters: nil, filePathKey: "file", dataKey: imageData, boundary: boundary, isImage: true)
         }
+        
+        let task =  URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) -> Void in
+            if let error = error {
+                debugPrint(error.localizedDescription)
+            }
+            
+            
+            let response = response as! HTTPURLResponse
+            if !(200...299).contains(response.statusCode) {
+                // handle HTTP server-side error
+                debugPrint("response", response)
+            }
+            
+//            let contentType = response.allHeaderFields["Content-Type"] as? String
+            
+            if let data = data {
+                self.uploadToBlockchain(data: data, title: title, password: password, txType: .imageUploaded)
+            }
+        })
+        
+        observation = task.progress.observe(\.fractionCompleted) { progress, _ in
+            DispatchQueue.main.async {
+                self.progressView.progress = Float(progress.fractionCompleted)
+            }
+        }
+        
+        task.resume()
+    }
+    
+    func uploadData(data: Data, title: String, password: String) {
+        // build request URL
+        guard let requestURL = URL(string: "https://express-ipfs-4djcj3hprq-ue.a.run.app/addFile") else {
+            return
+        }
+        
+        // prepare request
+        var request = URLRequest(url: requestURL)
+        request.httpMethod = MethodHttp.post.rawValue
+        
+        let boundary = generateBoundaryString()
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        // built data from img
+        request.httpBody = createBodyWithParameters(parameters: nil, filePathKey: "file", dataKey: data, boundary: boundary, isImage: false)
         
         let task =  URLSession.shared.dataTask(with: request, completionHandler: { (data, response, error) -> Void in
             if let error = error {
@@ -277,8 +330,11 @@ extension MainViewController: UITextFieldDelegate {
                 debugPrint("response", response)
             }
             
+            let contentType = response.allHeaderFields["Content-Type"] as? String
+            print("contentType", contentType)
+            
             if let data = data {
-                self.uploadToBlockchain(data: data, title: title, password: password)
+                self.uploadToBlockchain(data: data, title: title, password: password, txType: .docUploaded)
             }
         })
         
@@ -319,22 +375,25 @@ extension MainViewController: UITextFieldDelegate {
          */
         data.append("------\(boundary)\r\n")
         //Here you have to change the Content-Type
-        data.append("Content-Disposition: form-data; name=\"file\"; filename=\"YourFileName\"\r\n")
-        data.append("Content-Type: application/YourType\r\n\r\n")
+        data.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(title)\"\r\n")
+        data.append("Content-Type: application/*\r\n\r\n")
         data.append(fileData)
         data.append("\r\n")
         data.append("------\(boundary)--")
-        
+        print("body", data)
         request.httpBody = data
+        
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).sync {
             let session = URLSession.shared
             let task = session.dataTask(with: request, completionHandler: { [weak self](data, aResponse, error) in
                 if let error = error {
-                    self?.alert.show(error, for: self!)
+                    DispatchQueue.main.async {
+                        self?.alert.show(error, for: self!)
+                    }
                 }
                 
                 if let data = data {
-                    self?.uploadToBlockchain(data: data, title: title, password: password)
+                    self?.uploadToBlockchain(data: data, title: title, password: password, txType: .docUploaded)
                 }
             })
             
@@ -343,9 +402,11 @@ extension MainViewController: UITextFieldDelegate {
     }
     
     // MARK: - uploadToBlockchain
-    func uploadToBlockchain(data: Data, title: String, password: String) {
+    func uploadToBlockchain(data: Data, title: String, password: String, txType: TransactionType) {
+        print("data", data)
         do {
             if let responseObj = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue:0)) as? [String:Any] {
+                print("response", responseObj)
                 if let status = responseObj["ipfs success"] as? [String: Any],
                    let path = status["path"],
                    let size = status["size"] as? NSNumber {
@@ -354,10 +415,6 @@ extension MainViewController: UITextFieldDelegate {
                     let df = DateFormatter()
                     df.dateFormat = "yyyy-MM-dd HH:mm:ss"
                     let dateString = df.string(from: date)
-                    
-                    print("path", path)
-                    print("size", size.intValue)
-                    
                     
                     let parameters = [path, dateString, size.intValue, title] as [AnyObject]
                     transactionService.prepareTransactionForSettingFile(parameters: parameters) { [weak self](transaction, error) in
@@ -390,13 +447,38 @@ extension MainViewController: UITextFieldDelegate {
                                         return
                                     }
                                     
-                                    let localDatabase = LocalDatabase()
-                                    localDatabase.saveTransactionDetail(txHash: result.hash, fileHash: path, date: Date())
-                                    
                                     DispatchQueue.main.async {
                                         let finalAC = UIAlertController(title: "Success!", message: "Your file has been uploaded to the blockchain.", preferredStyle: .alert)
                                         finalAC.addAction(UIAlertAction(title: "OK", style: .default))
-                                        self?.present(finalAC, animated: true, completion: nil)
+                                        self?.present(finalAC, animated: true, completion: {
+                                            
+                                            let localDatabase = LocalDatabase()
+                                            if let wallet = localDatabase.getWallet() {
+                                                localDatabase.saveTransactionDetail(walletAddress: wallet.address,txHash: result.hash, fileHash: path, date: Date(), txType: txType)
+                                                
+                                                // Core Spotlight indexing for Progress
+                                                let attributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+                                                attributeSet.title = title
+                                                attributeSet.contentCreationDate = Date()
+                                                attributeSet.contentDescription = path
+                                                let titleKeywords =  title.components(separatedBy: " ")
+                                                var keywordsArr = ["productivity", "goal setting", "habit"]
+                                                for keyword in titleKeywords {
+                                                    keywordsArr.append(keyword)
+                                                }
+                                                attributeSet.keywords = keywordsArr
+                                                
+                                                let progressItem = CSSearchableItem(uniqueIdentifier: "\(result.hash)", domainIdentifier: "com.ovis.Buroku3", attributeSet: attributeSet)
+                                                progressItem.expirationDate = Date.distantFuture
+                                                CSSearchableIndex.default().indexSearchableItems([progressItem]) { (error) in
+                                                    if let error = error {
+                                                        print("Indexing error: \(error.localizedDescription)")
+                                                    } else {
+                                                        print("Search item for Progress successfully indexed")
+                                                    }
+                                                }
+                                            }
+                                        })
                                     }
                                 } catch Web3Error.nodeError(let desc) {
                                     if let index = desc.firstIndex(of: ":") {
@@ -408,7 +490,7 @@ extension MainViewController: UITextFieldDelegate {
                                     }
                                 } catch {
                                     DispatchQueue.main.async {
-                                        self?.alert.show("Error", with: "Sorry, there was an error uploading your file to a blockchain. Please verify that your password is correct.", for: self!)
+                                        self?.alert.show("Error", with: "Sorry, there was an error uploading your file to a blockchain. Please verify that your password is correct or you have enough in your wallet.", for: self!)
                                     }
                                 }
                             }
@@ -416,9 +498,10 @@ extension MainViewController: UITextFieldDelegate {
                     }
                 }
             }
-            
         } catch {
-            alert.show(error, for: self)
+            DispatchQueue.main.async { [weak self] in
+                self?.alert.show(error, for: self!)
+            }
         }
     }
 }
@@ -428,39 +511,3 @@ enum MethodHttp: String {
     case post = "POST"
 }
 
-
-//path QmRFaAjp7DbJbR5gCWqi3YUP1j2mtmkR5ycadGj38zA5Xg
-//size 41588
-//result from send TransactionSendingResult(transaction: Transaction
-//                                          Nonce: 8
-//                                          Gas price: 1000000000
-//                                          Gas limit: 215352
-//                                          To: 0xa276B436e35a76E96Bd47aDF2ec6e055433c76E2
-//                                          Value: 0
-//                                          Data: 0x0e35f95a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000a2740000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002e516d524661416a703744624a625235674357716933595550316a326d746d6b523579636164476a33387a413558670000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013323032312d30342d30322030303a32363a3037000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003646f630000000000000000000000000000000000000000000000000000000000
-//                                          v: 44
-//                                          r: 7574277574799132992794004946874512288298215552507783879242588293639620668450
-//                                          s: 18980064760772690692073485455370694255269313616131795825427837027448019977656
-//                                          Intrinsic chainID: Optional(4)
-//                                          Infered chainID: Optional(4)
-//                                          sender: Optional("0xb007c5a9AE516Fde594D1EB1240068C32Bfa6669")
-//                                          hash: Optional("0x8317aff9aa3937e188869b2a0d73e61fc644821127bc49be97024ce9d0246150")
-//                                          , hash: "0x8317aff9aa3937e188869b2a0d73e61fc644821127bc49be97024ce9d0246150")
-
-//path QmTiziYRGbboLu8MgKoqdUb6YPaqcjNdSPGYfC8hegkXXB
-//size 122659
-//result from send TransactionSendingResult(transaction: Transaction
-//                                          Nonce: 7
-//                                          Gas price: 1000000000
-//                                          Gas limit: 215364
-//                                          To: 0xa276B436e35a76E96Bd47aDF2ec6e055433c76E2
-//                                          Value: 0
-//                                          Data: 0x0e35f95a000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000001df230000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002e516d54697a6959524762626f4c75384d674b6f716455623659506171636a4e64535047596643386865676b5858420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000013323032312d30342d30322030303a32323a31380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000037069630000000000000000000000000000000000000000000000000000000000
-//                                          v: 44
-//                                          r: 91055262493689418372330695502260511544052726525900338040982716471224311363683
-//                                          s: 54463489728768820357537306614686117396227094691913088853915925520198575702571
-//                                          Intrinsic chainID: Optional(4)
-//                                          Infered chainID: Optional(4)
-//                                          sender: Optional("0xb007c5a9AE516Fde594D1EB1240068C32Bfa6669")
-//                                          hash: Optional("0xd279725747f8fd2dbdda69732c1745f34add35d40a5baae89153409f031791be")
-//                                          , hash: "0xd279725747f8fd2dbdda69732c1745f34add35d40a5baae89153409f031791be")

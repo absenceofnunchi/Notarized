@@ -6,9 +6,11 @@
 //
 
 import UIKit
+import web3swift
 
 protocol ContainerDelegate: AnyObject {
     func didSelectVC(_ menuType: MenuType)
+    func didSelectETCMenu(_ tag: Int)
 }
 
 class ContainerViewController: UIViewController {
@@ -17,6 +19,7 @@ class ContainerViewController: UIViewController {
     var filesVC = FilesViewController()
     var oldPageVC: UIViewController!
     var newPageVC: UIViewController!
+    let alert = Alerts()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,19 +91,36 @@ extension ContainerViewController: ContainerDelegate {
         let feedbackGenerator = UIImpactFeedbackGenerator(style: .light)
         feedbackGenerator.impactOccurred()
         
-        let destinationVC = menuType.VCType
-        
-        if destinationVC == FilesViewController.self {
-            let fvc = FilesViewController()
-            let nav = UINavigationController(rootViewController: fvc)
-            nav.view.tag = 1000
-            newPageVC = nav
-        } else {
-            newPageVC = destinationVC.init()
+        switch menuType {
+            case .files:
+                let destinationVC = menuType.VCType
+                let nav = UINavigationController(rootViewController: destinationVC.init())
+                newPageVC = nav
+            case .etherscan:
+                if let address = Web3swiftService.currentAddressString {
+                    let webVC = WebViewController()
+                    webVC.urlString = "https://etherscan.io/address/\(address)"
+                    newPageVC = webVC
+                } else {
+                    dismiss(animated: true) { [weak self] in
+                        self?.alert.show("No wallet", with: "You need to create/import a wallet first view your account on Etherscan", for: self!)
+                    }
+                    return
+                }
+            default:
+                let destinationVC = menuType.VCType
+                newPageVC = destinationVC.init()
         }
         
+//        if destinationVC == FilesViewController.self {
+//            let fvc = FilesViewController()
+//            let nav = UINavigationController(rootViewController: fvc)
+//            newPageVC = nav
+//        } else {
+//            newPageVC = destinationVC.init()
+//        }
+        
         addChild(newPageVC)
-        newPageVC.view.alpha = 0
         oldPageVC.willMove(toParent: nil)
         oldPageVC.beginAppearanceTransition(false, animated: true)
         newPageVC.beginAppearanceTransition(true, animated: true)
@@ -114,9 +134,13 @@ extension ContainerViewController: ContainerDelegate {
             self.oldPageVC = self.newPageVC
             self.newPageVC.view.translatesAutoresizingMaskIntoConstraints = false
             self.oldPageVC.view.fill()
-            self.oldPageVC.view.alpha = 1
             self.newPageVC = nil
         }
         dismiss(animated: true)
+    }
+    
+    // MARK: -
+    func didSelectETCMenu(_ tag: Int) {
+        print(tag)
     }
 }

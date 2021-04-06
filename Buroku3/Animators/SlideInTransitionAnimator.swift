@@ -14,7 +14,7 @@ class SlideInTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning
     let dimmingView = UIView()
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 0.3
+        return 0.2
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
