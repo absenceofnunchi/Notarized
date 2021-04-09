@@ -15,6 +15,7 @@ class RegisteredWalletViewController: UIViewController {
     var ethLabel: UILabel!
     var sendButton: WalletButtonView!
     var receiveButton: WalletButtonView!
+//    var rightBarButtonItem: UIBarButtonItem?
     
     let localDatabase = LocalDatabase()
     let keyservice = KeysService()
@@ -40,10 +41,30 @@ class RegisteredWalletViewController: UIViewController {
         super.viewDidAppear(animated)
         
         configureWallet()
+        configureNavigationItem(isVisible: true)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        configureNavigationItem(isVisible: false)
     }
 }
 
 extension RegisteredWalletViewController {
+    // MARK: - Configure Navigation Item
+    func configureNavigationItem(isVisible: Bool) {
+        if isVisible {
+            let rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(buttonHandler))
+            if rootViewController.children[0] is ContainerViewController {
+                rootViewController.children[0].navigationItem.setRightBarButton(rightBarButtonItem, animated: true)
+            }
+        } else {
+            if rootViewController.children[0] is ContainerViewController {
+                rootViewController.children[0].navigationItem.setRightBarButton(nil, animated: true)
+            }
+        }
+    }
+    
     func configureTopView() {
         // container view
         topBackgroundView = BackgroundView4()
@@ -139,10 +160,19 @@ extension RegisteredWalletViewController {
     }
     
     @objc func buttonHandler(_ sender: UIButton!) {
-        
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.tintColor = UIColor.black
+        spinner.startAnimating()
+        rootViewController.children[0].navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinner)
+        self.navigationItem.rightBarButtonItem?.isEnabled = false
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [self] (_) in
+            self.navigationItem.rightBarButtonItem?.isEnabled = true
+            spinner.stopAnimating()
+            rootViewController.children[0].navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(self.configureWallet))
+        }
     }
     
-    func configureWallet() {
+    @objc func configureWallet() {
         guard let address = Web3swiftService.currentAddress else {
             alert.show("Error", with: "There was an error obtaining the wallet address", for: self)
             return

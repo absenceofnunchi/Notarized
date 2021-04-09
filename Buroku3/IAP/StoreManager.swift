@@ -53,6 +53,7 @@ class StoreManager: NSObject {
         // Create a set for the product identifiers.
         let productIdentifiers = Set(identifiers)
         
+        print(("identifiers in StoreManager", identifiers))
         // Initialize the product request with the above identifiers.
         productRequest = SKProductsRequest(productIdentifiers: productIdentifiers)
         productRequest.delegate = self
@@ -90,6 +91,7 @@ extension StoreManager: SKProductsRequestDelegate {
     /// Used to get the App Store's response to your request and notify your observer.
     /// - Tag: ProductRequest
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        print("response in store manager", response )
         if !storeResponse.isEmpty {
             storeResponse.removeAll()
         }

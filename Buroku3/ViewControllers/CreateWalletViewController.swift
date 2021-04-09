@@ -180,6 +180,24 @@ extension CreateWalletViewController {
     // MARK: - SetConstraints
     
     func setConstraints() {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                containerView.heightAnchor.constraint(equalToConstant: 350),
+            ])
+        }else{
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1.2),
+            ])
+        }
+        
         NSLayoutConstraint.activate([
             // close button
             closeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
@@ -192,12 +210,6 @@ extension CreateWalletViewController {
             animationView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             animationView.heightAnchor.constraint(equalToConstant: 200),
             animationView.widthAnchor.constraint(equalTo: animationView.heightAnchor),
-            
-            // container view
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1.2),
             
             // paswords don't match label
             passwordsDontMatch.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),

@@ -173,6 +173,10 @@ extension UIViewController {
             }
         }
     }
+    
+    var rootViewController: UIViewController {
+        return UIApplication.shared.windows.first!.rootViewController!
+    }
 }
 
 // MARK: - Section
@@ -237,33 +241,6 @@ extension UIBarItem: EnableItem {
     /// Disable the bar item.
     func disable() {
         self.isEnabled = false
-    }
-}
-
-// MARK: - ProductIdentifiers
-extension ProductIdentifiers {
-    var isEmpty: String {
-        return "\(key) from \(store) is empty. \(Messages.updateResource)"
-    }
-    
-    var wasNotFound: String {
-        return "\(Messages.couldNotFind) \(key) from \(store)."
-    }
-    
-    /// - returns: An array with the product identifiers to be queried.
-    var identifiers: [String]? {
-        let keyValStore = NSUbiquitousKeyValueStore.default
-        if let dict = keyValStore.array(forKey: key) as? [String] {
-            return dict
-        } else {
-            let productIDs = [ProductIDs.oneMonth.rawValue, ProductIDs.sixMonths.rawValue, ProductIDs.oneYear.rawValue]
-            keyValStore.set(productIDs, forKey: key)
-            if let dict = keyValStore.array(forKey: key) as? [String] {
-                return dict
-            } else {
-                return nil
-            }
-        }
     }
 }
 

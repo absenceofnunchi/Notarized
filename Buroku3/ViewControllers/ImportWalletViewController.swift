@@ -181,6 +181,24 @@ extension ImportWalletViewController {
     }
     
     func setConstraints() {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                containerView.heightAnchor.constraint(equalToConstant: 350),
+            ])
+        }else{
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1.2),
+            ])
+        }
+        
         NSLayoutConstraint.activate([
             // close button
             closeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
@@ -191,12 +209,6 @@ extension ImportWalletViewController {
             // warning label
             warningLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
             warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            // container view
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1.2),
             
             // animation view
             animationView.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),
@@ -308,8 +320,7 @@ extension ImportWalletViewController {
             
             guard let wallet = wallet else { return }
             self?.localDatabase.saveWallet(isRegistered: true, wallet: wallet) { [weak self](error) in
-                if let error = error {
-                    print("saveWallet error", error)
+                if let _ = error {
                     DispatchQueue.main.async {
                         self?.alert.show("Error", with: "There was an error saving your imported wallet", for: self!)
                     }
@@ -323,6 +334,3 @@ extension ImportWalletViewController {
         }
     }
 }
-
-
-// 00eb9a15f4f697b5e58b6f8eb1c79ec458f57609a14b68501e39138677da349b

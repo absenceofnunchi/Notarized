@@ -63,12 +63,12 @@ class ParentViewController: UIViewController {
     
     fileprivate var utility = Utilities()
     fileprivate lazy var products: Products = {
-        let identifier = ViewControllerIdentifiers.products
+//        let identifier = ViewControllerIdentifiers.products
         let controller = Products()
         return controller
     }()
     fileprivate lazy var purchases: Purchases = {
-        let identifier = ViewControllerIdentifiers.purchases
+//        let identifier = ViewControllerIdentifiers.purchases
         let controller = Purchases()
         return controller
     }()
@@ -252,6 +252,7 @@ class ParentViewController: UIViewController {
                 // Refresh the UI with identifiers to be queried.
                 products.reload(with: [Section(type: .invalidProductIdentifiers, elements: identifiers)])
                 
+                print("identifiers", identifiers)
                 // Fetch product information.
                 StoreManager.shared.startProductRequest(with: identifiers)
             } else {

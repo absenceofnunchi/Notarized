@@ -8,7 +8,6 @@
 import UIKit
 
 class WalletViewController: UIViewController {
-    var rightBarButtonItem: UIBarButtonItem?
     let localDatabase = LocalDatabase()
     var newPageVC: UIViewController!
     var oldPageVC: UIViewController!
@@ -39,31 +38,11 @@ class WalletViewController: UIViewController {
         super.viewDidLoad()
 
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        configureNavigationItem()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.parent?.navigationItem.setRightBarButton(nil, animated: true)
-    }
 }
 
-extension WalletViewController {
-
-    // MARK: - Configure Navigation Item
-    func configureNavigationItem() {
-        rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "rectangle.stack.badge.plus"), style: .plain, target: self, action: #selector(buttonHandler))
-        rightBarButtonItem?.tag = 1
-        self.parent?.navigationItem.setRightBarButton(rightBarButtonItem, animated: true)
-    }
-    
-
+extension WalletViewController {  
     func configureChildVC() {
         addChild(newPageVC)
-        newPageVC.view.alpha = 0
         oldPageVC.willMove(toParent: nil)
         oldPageVC.beginAppearanceTransition(false, animated: true)
         newPageVC.beginAppearanceTransition(true, animated: true)
@@ -77,13 +56,8 @@ extension WalletViewController {
             self.oldPageVC = self.newPageVC
             self.newPageVC.view.translatesAutoresizingMaskIntoConstraints = false
             self.oldPageVC.view.fill()
-            self.oldPageVC.view.alpha = 1
             self.newPageVC = nil
         }
-    }
-    
-    @objc func buttonHandler(_ sender: UIButton!) {
-        
     }
 }
 
@@ -91,6 +65,12 @@ extension WalletViewController: WalletDelegate {
     func didProcessWallet() {
         if let _ = localDatabase.getWallet() {
             if !(self.children[0].isKind(of: RegisteredWalletViewController.self)) {
+                if self.parent == nil {
+                    let window = UIApplication.shared.windows.first
+                    let nav = UINavigationController(rootViewController: ContainerViewController())
+                    window?.rootViewController = nav
+                }
+                
                 newPageVC = RegisteredWalletViewController()
                 configureChildVC()
             }

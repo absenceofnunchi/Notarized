@@ -19,6 +19,7 @@ class ReceiveViewController: UIViewController {
     var qrCodeImageView: UIImageView!
     var qrCodeImage: UIImage!
     var addressLabel: EdgeInsetLabel!
+    let alert = Alerts()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,9 +113,10 @@ extension ReceiveViewController {
         
         copyButton = WalletButtonView(imageName: "square.on.square", labelName: "Copy")
         copyButton.buttonAction = { [weak self] in
-            let pasteboard = UIPasteboard.general
-            pasteboard.string = self?.address ?? ""
-            print("copied")
+//            let pasteboard = UIPasteboard.general
+//            pasteboard.string = self?.address ?? ""
+            
+            self?.alert.fading(controller: self!, toBePasted: self?.address ?? "")
         }
         
         shareButton = WalletButtonView(imageName: "square.and.arrow.up", labelName: "Share")

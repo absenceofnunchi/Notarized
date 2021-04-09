@@ -312,8 +312,7 @@ extension FilesViewController: UITextFieldDelegate {
             if let transaction = transaction {
                 DispatchQueue.global().async {
                     do {
-                        let result = try transaction.send(password: password, transactionOptions: nil)
-                        print("deleted result", result)
+                        let _ = try transaction.send(password: password, transactionOptions: nil)
                         DispatchQueue.main.async {
                             self?.tableView.reloadData()
                         }
@@ -340,6 +339,34 @@ extension FilesViewController: UITextFieldDelegate {
                     }
                 }
             }
+        }
+    }
+}
+
+extension FilesViewController: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView,contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let datum = data[indexPath.row]
+        
+        func getPreviewVC(indexPath: IndexPath) -> UIViewController? {
+            let webVC = WebViewController()
+            webVC.urlString = "https://ipfs.io/ipfs/\(datum.hash)"
+            return webVC
+        }
+        
+        let delete = UIAction(title: "Delete", image: UIImage(systemName: "trash"), attributes: .destructive) { [weak self] action in
+            self?.alert.withPassword(title: "Delete File", delegate: self!, controller: self!, completion: { (password) in
+                if let file = self?.data[indexPath.row] {
+                    self?.deleteAction(for: file, password: password)
+                }
+            })
+        }
+        
+        return UIContextMenuConfiguration(identifier: "DetailPreview" as NSString, previewProvider: { getPreviewVC(indexPath: indexPath) }) { _ in
+            UIMenu(title: "", children: [delete])
         }
     }
 }

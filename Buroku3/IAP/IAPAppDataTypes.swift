@@ -125,6 +125,14 @@ struct ViewControllerIdentifiers {
     static let purchases = "purchases"
 }
 
+// MARK: - Resource File
+enum ProductIDs: String {
+    case oneMonth = "com.ovis.Buroku4.1month"
+//    case sixMonths = "BUROKU_SUB6"
+//    case oneYear = "BUROKU_SUB12"
+//    case threeMonths = "burokusub3"
+}
+    
 /// A structure that specifies the property name and NSUbiquitousKeyValueStore from iCloud, which contains the product identifiers to be queried.
 struct ProductIdentifiers {
     /// Name of the key for the array of product identifiers.
@@ -133,9 +141,30 @@ struct ProductIdentifiers {
     let store = "NSUbiquitousKeyValueStore"
 }
 
-// MARK: - Resource File
-enum ProductIDs: String {
-    case oneMonth = "com.noName.Hundred"
-    case sixMonths = "com.noName.Hundred6months"
-    case oneYear = "com.noName.Hundred1year"
+extension ProductIdentifiers {
+    var isEmpty: String {
+        return "\(key) from \(store) is empty. \(Messages.updateResource)"
+    }
+    
+    var wasNotFound: String {
+        return "\(Messages.couldNotFind) \(key) from \(store)."
+    }
+    
+    /// - returns: An array with the product identifiers to be queried.
+    var identifiers: [String]? {
+        let keyValStore = NSUbiquitousKeyValueStore.default
+        if let dict = keyValStore.array(forKey: key) as? [String] {
+            return dict
+        } else {
+//            let productIDs = [ProductIDs.oneMonth.rawValue, ProductIDs.sixMonths.rawValue, ProductIDs.oneYear.rawValue]
+            let productIDs = [ProductIDs.oneMonth.rawValue]
+
+            keyValStore.set(productIDs, forKey: key)
+            if let dict = keyValStore.array(forKey: key) as? [String] {
+                return dict
+            } else {
+                return nil
+            }
+        }
+    }
 }

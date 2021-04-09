@@ -89,6 +89,35 @@ class KeysService: IKeysService {
         let data = try keystoreManager()?.UNSAFE_getPrivateKeyData(password: password, account: address)
         return data?.toHexString()
     }
+    
+    func resetPassword(oldPassword: String, newPassword: String, completion: @escaping (KeyWalletModel?, ResetPasswordError?) -> Void) {
+        guard let selectedWallet = selectedWallet(),
+              let data = selectedWallet.data,
+              let ks = EthereumKeystoreV3(data) else {
+            DispatchQueue.main.async {
+                completion(nil, ResetPasswordError.failureToFetchOldPassword)
+            }
+            return
+        }
+        
+        do {
+            try ks.regenerate(oldPassword: oldPassword, newPassword: newPassword)
+            guard let pk = try getWalletPrivateKey(password: oldPassword) else { return }
+            addNewWalletWithPrivateKey(key: pk, password: newPassword) { (wallet, error) in
+                if let error = error {
+                    print("error from getting the private key", error)
+                }
+                
+                DispatchQueue.main.async {
+                    completion(wallet, nil)
+                }
+            }
+        } catch {
+            DispatchQueue.main.async {
+                completion(nil, ResetPasswordError.failureToRegeneratePassword)
+            }
+        }
+    }
 }
 
 protocol IKeysService {

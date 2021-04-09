@@ -8,9 +8,9 @@
 import UIKit
 
 enum WalletMenu: String {
-    case address = "Address"
+    case resetPassword = "Reset Password"
     case privateKey = "Private Key"
-    case delete = "Delete Wallet"
+    case logout = "Logout"
 }
 
 class SinglePageViewController: UIViewController {
@@ -28,6 +28,7 @@ class SinglePageViewController: UIViewController {
     var delegate: WalletDelegate?
     var tableView: UITableView!
     var data: [TxModel]!
+    var popup: UIView!
     
     init(gallery: String) {
         self.gallery = gallery
@@ -87,9 +88,9 @@ extension SinglePageViewController: UITextFieldDelegate {
         containerView.addSubview(blurEffectView)
         
         // buttons
-        addressButton = createButton(title: NSLocalizedString(WalletMenu.address.rawValue, comment: ""), tag: 1)
+        addressButton = createButton(title: NSLocalizedString(WalletMenu.resetPassword.rawValue, comment: ""), tag: 1)
         privateKeyButton = createButton(title: NSLocalizedString(WalletMenu.privateKey.rawValue, comment: ""), tag: 2)
-        deleteButton = createButton(title: NSLocalizedString(WalletMenu.delete.rawValue, comment: ""), tag: 3)
+        deleteButton = createButton(title: NSLocalizedString(WalletMenu.logout.rawValue, comment: ""), tag: 3)
         
         // stack view
         stackView = UIStackView(arrangedSubviews: [addressButton, privateKeyButton, deleteButton])
@@ -122,12 +123,8 @@ extension SinglePageViewController: UITextFieldDelegate {
     func createButton(title: String, tag: Int) -> UIButton {
         let button = UIButton()
 
-//        button.backgroundColor = UIColor(red: 167/255, green: 197/255, blue: 235/255, alpha: 1)
         button.backgroundColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
-
-        if title == NSLocalizedString(WalletMenu.delete.rawValue, comment: "") {
-//            button.backgroundColor = UIColor(red: 255/255, green: 85/255, blue: 73/255, alpha: 1)
-//            button.titleLabel?.textColor = UIColor(red: 255/255, green: 85/255, blue: 73/255, alpha: 1)
+        if title == NSLocalizedString(WalletMenu.logout.rawValue, comment: "") {
             button.setTitleColor(UIColor(red: 255/255, green: 85/255, blue: 73/255, alpha: 1), for: .normal)
             
         } else {
@@ -156,15 +153,57 @@ extension SinglePageViewController: UITextFieldDelegate {
         
         switch sender.tag {
             case 1:
-                guard let address = wallet?.address else {
-                    alert.show("No wallet available", with: "Create a new wallet", for: self)
-                    return
+                // reset password
+                let ac = UIAlertController(title: "Reset Password", message: "The password allows you to send Ether or upload files to the blockchain. Please store the new password safely since it cannot be recovered once it's lost", preferredStyle: .alert)
+                
+                ac.addTextField { (textField: UITextField!) in
+                    textField.delegate = self
+                    textField.isSecureTextEntry = true
+                    textField.placeholder = "Current password"
                 }
-                let detailVC = DetailViewController()
-                detailVC.title = "Address"
-                detailVC.info = address
-                self.present(detailVC, animated: true)
+                
+                ac.addTextField { (textField: UITextField!) in
+                    textField.delegate = self
+                    textField.isSecureTextEntry = true
+                    textField.placeholder = "New password"
+                }
+                
+                let enterAction = UIAlertAction(title: "Enter", style: .default) { [unowned ac, weak self](_) in
+                    guard let textField = ac.textFields?.first, let oldPassword = textField.text else { return }
+                    guard let textField2 = ac.textFields?[1], let newPassword = textField2.text else { return }
+
+                    self?.keyService.resetPassword(oldPassword: oldPassword, newPassword: newPassword) { [weak self](wallet, error) in
+                        if let error = error {
+                            switch error {
+                                case .failureToFetchOldPassword:
+                                    self?.alert.show("Error", with: "Sorry, the old password couldn't be fetched", for: self!)
+                                case .failureToRegeneratePassword:
+                                    self?.alert.show("Error", with: "Sorry, a new password couldn't be generated", for: self!)
+                            }
+                        }
+                        
+                        if let wallet = wallet {
+                            self?.localDatabase.saveWallet(isRegistered: false, wallet: wallet) { (error) in
+                                if let _ = error {
+                                    self?.alert.show("Error", with: "Sorry, there was an error generating a new password. Check to see if you're using the correct password.", for: self!)
+                                }
+                                
+                                self?.alert.show("Success", with: "A new password has been generated!", for: self!)
+                            }
+                        }
+                    }
+                }
+                
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+                
+                ac.addAction(enterAction)
+                ac.addAction(cancelAction)
+                DispatchQueue.main.async {
+                    self.present(ac, animated: true, completion: nil)
+                }
+
             case 2:
+                // show private key
                 let ac = UIAlertController(title: "Enter the password", message: nil, preferredStyle: .alert)
                 ac.addTextField { (textField: UITextField!) in
                     textField.delegate = self
@@ -175,14 +214,19 @@ extension SinglePageViewController: UITextFieldDelegate {
 
                     do {
                         let privateKey = try self?.keyService.getWalletPrivateKey(password: text)
-                        print("private key", privateKey)
+                        let detailVC = DetailViewController(height: 250)
+                        detailVC.titleString = "Private Key"
+                        detailVC.message = privateKey
+                        detailVC.buttonAction = { vc in
+                            self?.alert.fading(controller: vc, toBePasted: privateKey ?? "")
+                        }
+                        self?.present(detailVC, animated: true, completion: nil)
                     } catch {
                         self?.alert.show("Wrong password", with: nil, for: self!)
                     }
                 }
 
                 let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-
                 ac.addAction(enterAction)
                 ac.addAction(cancelAction)
                 self.present(ac, animated: true, completion: nil)
@@ -191,19 +235,32 @@ extension SinglePageViewController: UITextFieldDelegate {
                 ac.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { [weak self](_) in
                     
                     self?.localDatabase.deleteWallet { [weak self](error) in
+                        if let error = error {
+                            switch error {
+                                case .couldNotDeleteTheWallet:
+                                    self?.alert.show("Error", with: "Could not delete the wallet.", for: self!)
+                                default:
+                                    break
+                            }
+                        }
+                        
                         self?.delegate?.didProcessWallet()
                     }
                     
-//                    let rootVC = UIApplication.shared.windows.first!.rootViewController as! UINavigationController
-//                    let childVC = rootVC.viewControllers[0]
-//                    for case let vc as WalletViewController in childVC.children {
-//                    }
-
+                    let window = UIApplication.shared.windows.first
+                    let walletVC = WalletViewController()
+                    window?.rootViewController = walletVC
                 }))
                 ac.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
                 self.present(ac, animated: true, completion: nil)
             default:
                 break
+        }
+    }
+    
+    @objc func dismissAlert(){
+        if popup != nil {
+            popup.removeFromSuperview()
         }
     }
 }
@@ -214,8 +271,8 @@ extension SinglePageViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: Cell.activityCell)
         tableView.delegate = self
         tableView.dataSource = self
-        
-        if let transations = localDatabase.getAllTransactionHashes() {
+                
+        if let transations = localDatabase.getAllTransactionHashes(walletAddress: Web3swiftService.currentAddressString!, predicateName: "transactionType", predicate: TransactionType.etherSent.rawValue) {
             data = transations
         }
     }
@@ -237,10 +294,35 @@ extension SinglePageViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.activityCell, for: indexPath)
-//        let transaction = data[indexPath.row]
+        var cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: Cell.activityCell, for: indexPath)
+        if cell.detailTextLabel == nil {
+            cell = UITableViewCell(style: .subtitle, reuseIdentifier: Cell.activityCell)
+        }
+        cell.selectionStyle = .none
+        
+        let transaction = data[indexPath.row]
+        cell.textLabel?.text = transaction.transactionHash
+        
+        let formatter1 = DateFormatter()
+        formatter1.dateStyle = .short
+        
+        let formatter2 = DateFormatter()
+        formatter2.timeStyle = .short
+        
+        cell.detailTextLabel?.text = formatter1.string(from: transaction.date) + " " + formatter2.string(from: transaction.date)
         
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let datum = data[indexPath.row]
+        
+        let detailVC = DetailViewController(height: 250)
+        detailVC.titleString = "Transaction Hash"
+        detailVC.message = "\(datum.transactionHash) \n\n * Only displays sent transactions"
+        detailVC.buttonAction = { [weak self] vc in
+            self?.alert.fading(controller: vc, toBePasted: datum.transactionHash)
+        }
+        present(detailVC, animated: true, completion: nil)
+    }
 }

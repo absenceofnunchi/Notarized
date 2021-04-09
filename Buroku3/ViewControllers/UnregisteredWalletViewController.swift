@@ -15,7 +15,7 @@ class UnregisteredWalletViewController: UIViewController {
     var walletLogoImageView: UIImageView!
     var imageContainerView: UIView!
     var backgroundAnimator: UIViewPropertyAnimator!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
             
@@ -77,7 +77,15 @@ extension UnregisteredWalletViewController {
         containerView.addSubview(imageContainerView)
         
         let configuration = UIImage.SymbolConfiguration(pointSize: 10, weight: .light)
-        let image = UIImage(systemName: "wallet.pass", withConfiguration: configuration)?.withTintColor(.white, renderingMode: .alwaysOriginal)
+        
+        var imageName: String!
+        if #available(iOS 14, *) {
+            imageName = "wallet.pass"
+        } else {
+            imageName = "creditcard"
+        }
+        
+        let image = UIImage(systemName: imageName, withConfiguration: configuration)?.withTintColor(.white, renderingMode: .alwaysOriginal)
         walletLogoImageView = UIImageView(image: image)
         walletLogoImageView.backgroundColor = .black
         walletLogoImageView.layer.cornerRadius = 15
@@ -104,13 +112,26 @@ extension UnregisteredWalletViewController {
     }
     
     func setConstraints() {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+//                containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.5),
+                containerView.heightAnchor.constraint(equalToConstant: 350),
+            ])
+        }else{
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1.2),
+            ])
+        }
+        
         NSLayoutConstraint.activate([
-            // container view
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            containerView.heightAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 1.2),
-            
             imageContainerView.widthAnchor.constraint(equalToConstant: 50),
             imageContainerView.heightAnchor.constraint(equalToConstant: 50),
             imageContainerView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 50),

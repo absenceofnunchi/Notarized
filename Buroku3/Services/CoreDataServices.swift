@@ -61,31 +61,42 @@ class LocalDatabase {
         }
     }
     
-    func saveWallet(isRegistered: Bool, wallet: KeyWalletModel, completion: @escaping (Error?) -> Void) {
-        container.performBackgroundTask { (context) in
-            guard let entity = NSEntityDescription.insertNewObject(forEntityName: "KeyWallet", into: context) as? KeyWallet else { return }
-            entity.address = wallet.address
-            entity.data = wallet.data
-            entity.isRegistered = isRegistered
+    func saveWallet(isRegistered: Bool, wallet: KeyWalletModel, completion: @escaping (WalletSavingError?) -> Void) {
+        container.performBackgroundTask { [weak self](context) in
             
-            do {
-                try context.save()
-                DispatchQueue.main.async {
-                    completion(nil)
+            self?.deleteWallet { (error) in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        completion(error)
+                    }
                 }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(error)
+                
+                guard let entity = NSEntityDescription.insertNewObject(forEntityName: "KeyWallet", into: context) as? KeyWallet else { return }
+                print("entity", entity)
+                entity.address = wallet.address
+                entity.data = wallet.data
+                entity.isRegistered = isRegistered
+                
+                do {
+                    try context.save()
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        completion(WalletSavingError.couldNotSaveTheWallet)
+                    }
                 }
             }
         }
     }
     
-    func deleteWallet(completion: @escaping (Error?) -> Void) {
+    func deleteWallet(completion: @escaping (WalletSavingError?) -> Void) {
         let requestWallet: NSFetchRequest<KeyWallet> = KeyWallet.fetchRequest()
         
         do {
             let result = try mainContext.fetch(requestWallet)
+            print("result", result)
             for item in result {
                 mainContext.delete(item)
             }
@@ -93,7 +104,9 @@ class LocalDatabase {
             try mainContext.save()
             completion(nil)
         } catch {
-            completion(error)
+            DispatchQueue.main.async {
+                completion(WalletSavingError.couldNotDeleteTheWallet)
+            }
         }
     }
     
@@ -116,6 +129,27 @@ class LocalDatabase {
     func getAllTransactionHashes(walletAddress: String) -> [TxModel]? {
         let requestTransaction: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
         requestTransaction.predicate = NSPredicate(format: "walletAddress == %@", walletAddress)
+        let sort = NSSortDescriptor(key: "date", ascending: true)
+        requestTransaction.sortDescriptors = [sort]
+        
+        do {
+            let results = try mainContext.fetch(requestTransaction)
+            
+            let tx = results.map { result in
+                return TxModel.fromCoreData(crModel: result)
+            }
+            return tx
+        } catch {
+            print(error)
+            return nil
+        }
+    }
+    
+    func getAllTransactionHashes(walletAddress: String, predicateName: String, predicate: String) -> [TxModel]? {
+        let requestTransaction: NSFetchRequest<TransactionModel> = TransactionModel.fetchRequest()
+        let walletAddressPredicate =  NSPredicate(format: "walletAddress == %@", walletAddress)
+        let additionalPredicate = NSPredicate(format: "\(predicateName) == %@", predicate)
+        requestTransaction.predicate = NSCompoundPredicate(type: .and, subpredicates: [walletAddressPredicate, additionalPredicate])
         let sort = NSSortDescriptor(key: "date", ascending: true)
         requestTransaction.sortDescriptors = [sort]
         

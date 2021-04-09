@@ -42,6 +42,7 @@ class Alerts {
         ac.addTextField { (textField: UITextField!) in
             textField.delegate = delegate
             textField.placeholder = "Password for your wallet"
+            textField.isSecureTextEntry = true
         }
         
         let enterAction = UIAlertAction(title: "Enter", style: .default) { [unowned ac](_) in
@@ -80,6 +81,44 @@ class Alerts {
         ac.addAction(cancelAction)
         DispatchQueue.main.async {
             controller.present(ac, animated: true, completion: nil)
+        }
+    }
+    
+    func fading(controller: UIViewController, toBePasted: String) {
+        let dimmingView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        dimmingView.translatesAutoresizingMaskIntoConstraints = false
+        dimmingView.layer.cornerRadius = 10
+        dimmingView.clipsToBounds = true
+        controller.view.addSubview(dimmingView)
+        
+        let label = UILabel()
+        label.text = "Copied!"
+        label.textColor = .white
+        label.textAlignment = .center
+        label.sizeToFit()
+        label.backgroundColor = .clear
+        label.translatesAutoresizingMaskIntoConstraints = false
+        dimmingView.contentView.addSubview(label)
+        
+        if toBePasted != nil {
+            let pasteboard = UIPasteboard.general
+            pasteboard.string = toBePasted
+        }
+        
+        NSLayoutConstraint.activate([
+            dimmingView.centerYAnchor.constraint(equalTo: controller.view.centerYAnchor),
+            dimmingView.centerXAnchor.constraint(equalTo: controller.view.centerXAnchor),
+            dimmingView.widthAnchor.constraint(equalToConstant: 150),
+            dimmingView.heightAnchor.constraint(equalToConstant: 50),
+            
+            label.centerXAnchor.constraint(equalTo: dimmingView.contentView.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: dimmingView.contentView.centerYAnchor)
+        ])
+        
+        Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { timer in
+            dimmingView.removeFromSuperview()
+            timer.invalidate()
+            controller.dismiss(animated: true, completion: nil)
         }
     }
 }

@@ -291,24 +291,3 @@ enum SendEthResult<T> {
     case Success(T)
     case Error(Error)
 }
-
-enum SendEthErrors: Error {
-    case invalidDestinationAddress
-    case invalidAmountFormat
-    case emptyDestinationAddress
-    case emptyAmount
-    case contractLoadingError
-    case retrievingGasPriceError
-    case retrievingEstimatedGasError
-    case emptyResult
-    case noAvailableKeys
-    case createTransactionIssue
-    case zeroAmount
-    case insufficientFund
-}
-
-enum AccountContractErrors: Error {
-    case contractLoadingError
-    case instantiateContractError
-}
-

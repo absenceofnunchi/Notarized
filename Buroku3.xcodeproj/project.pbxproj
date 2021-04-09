@@ -28,6 +28,7 @@
 		492D69E1260548CA00FCDD20 /* CreateWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D69E0260548CA00FCDD20 /* CreateWalletViewController.swift */; };
 		492D69E4260549CF00FCDD20 /* MenuType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D69E3260549CF00FCDD20 /* MenuType.swift */; };
 		492D69E82605721800FCDD20 /* CustomCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D69E72605721800FCDD20 /* CustomCells.swift */; };
+		492F824D261F872A00E3AF8F /* TermsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492F824C261F872900E3AF8F /* TermsViewController.swift */; };
 		494A637D261AAC66004B4263 /* TransactionHistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494A637C261AAC66004B4263 /* TransactionHistoryViewController.swift */; };
 		495986522607A95F0018A0BC /* WalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495986512607A95F0018A0BC /* WalletViewController.swift */; };
 		495986552607D5F70018A0BC /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495986542607D5F70018A0BC /* DetailViewController.swift */; };
@@ -101,10 +102,11 @@
 		4984E679260FA49000868BB0 /* BackgroundView7.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4984E678260FA49000868BB0 /* BackgroundView7.swift */; };
 		4984E67C2610260B00868BB0 /* PreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4984E67B2610260B00868BB0 /* PreviewVC.swift */; };
 		498F17E0260E9B8500545190 /* ImportWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 498F17DF260E9B8500545190 /* ImportWalletViewController.swift */; };
-		49A4BDDC2605A893009E8911 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4BDDB2605A893009E8911 /* SettingsViewController.swift */; };
+		499E1F37261EB45200B4A07C /* LogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499E1F36261EB45200B4A07C /* LogoView.swift */; };
 		49A4BDE02605AE3D009E8911 /* AlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4BDDF2605AE3D009E8911 /* AlertsView.swift */; };
 		49AE6A5B260EAD94007A3C9E /* BackgroundView6.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49AE6A5A260EAD94007A3C9E /* BackgroundView6.swift */; };
 		49AE6A5E260EEB91007A3C9E /* BlurEffectContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49AE6A5D260EEB91007A3C9E /* BlurEffectContainerView.swift */; };
+		49B85114261D0CB80037118A /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49B85113261D0CB80037118A /* CloudKit.framework */; };
 		49C7467A2609579E006E6544 /* BackgroundView3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C746792609579E006E6544 /* BackgroundView3.swift */; };
 		49C7467D260987D5006E6544 /* CascadeTransitionAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7467C260987D5006E6544 /* CascadeTransitionAnimator.swift */; };
 		49D9C3FA260BB3D10014960A /* ReceiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49D9C3F9260BB3D00014960A /* ReceiveViewController.swift */; };
@@ -148,6 +150,7 @@
 		492D69E0260548CA00FCDD20 /* CreateWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateWalletViewController.swift; sourceTree = "<group>"; };
 		492D69E3260549CF00FCDD20 /* MenuType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuType.swift; sourceTree = "<group>"; };
 		492D69E72605721800FCDD20 /* CustomCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCells.swift; sourceTree = "<group>"; };
+		492F824C261F872900E3AF8F /* TermsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsViewController.swift; sourceTree = "<group>"; };
 		494A637C261AAC66004B4263 /* TransactionHistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHistoryViewController.swift; sourceTree = "<group>"; };
 		495986512607A95F0018A0BC /* WalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewController.swift; sourceTree = "<group>"; };
 		495986542607D5F70018A0BC /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
@@ -223,10 +226,12 @@
 		4984E678260FA49000868BB0 /* BackgroundView7.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView7.swift; sourceTree = "<group>"; };
 		4984E67B2610260B00868BB0 /* PreviewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewVC.swift; sourceTree = "<group>"; };
 		498F17DF260E9B8500545190 /* ImportWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportWalletViewController.swift; sourceTree = "<group>"; };
-		49A4BDDB2605A893009E8911 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		499E1F36261EB45200B4A07C /* LogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoView.swift; sourceTree = "<group>"; };
 		49A4BDDF2605AE3D009E8911 /* AlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsView.swift; sourceTree = "<group>"; };
 		49AE6A5A260EAD94007A3C9E /* BackgroundView6.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView6.swift; sourceTree = "<group>"; };
 		49AE6A5D260EEB91007A3C9E /* BlurEffectContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurEffectContainerView.swift; sourceTree = "<group>"; };
+		49B85111261D0CB20037118A /* Buroku3.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Buroku3.entitlements; sourceTree = "<group>"; };
+		49B85113261D0CB80037118A /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		49C746792609579E006E6544 /* BackgroundView3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView3.swift; sourceTree = "<group>"; };
 		49C7467C260987D5006E6544 /* CascadeTransitionAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CascadeTransitionAnimator.swift; sourceTree = "<group>"; };
 		49D9C3F9260BB3D00014960A /* ReceiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveViewController.swift; sourceTree = "<group>"; };
@@ -251,6 +256,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				49B85114261D0CB80037118A /* CloudKit.framework in Frameworks */,
 				B4091A928666898BF11698DB /* Pods_Buroku3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,6 +267,7 @@
 		1B2CB73C994C085DD271CA8D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				49B85113261D0CB80037118A /* CloudKit.framework */,
 				EF26DE2636AF220754C3F111 /* Pods_Buroku3.framework */,
 			);
 			name = Frameworks;
@@ -337,6 +344,7 @@
 		49624D2926014463006C42AF /* Buroku3 */ = {
 			isa = PBXGroup;
 			children = (
+				49B85111261D0CB20037118A /* Buroku3.entitlements */,
 				49746733261B92AB00D60B94 /* TransactionModel+CoreDataClass.swift */,
 				49746734261B92AB00D60B94 /* TransactionModel+CoreDataProperties.swift */,
 				4908401226159AEA00CC26C9 /* KeyWallet+CoreDataClass.swift */,
@@ -428,6 +436,7 @@
 				490840192615B2BC00CC26C9 /* ButtonCell.swift */,
 				4974672F261B8A3F00D60B94 /* TxHistoryCell.swift */,
 				49746738261BEE1300D60B94 /* GroupedButtonsCell.swift */,
+				499E1F36261EB45200B4A07C /* LogoView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -441,7 +450,6 @@
 				492D69442603DE6100FCDD20 /* FilesViewController.swift */,
 				49083FE126153C6900CC26C9 /* FilesViewController + ResultsUpdate.swift */,
 				492D69E0260548CA00FCDD20 /* CreateWalletViewController.swift */,
-				49A4BDDB2605A893009E8911 /* SettingsViewController.swift */,
 				495986512607A95F0018A0BC /* WalletViewController.swift */,
 				495986542607D5F70018A0BC /* DetailViewController.swift */,
 				492D693A2603C0DD00FCDD20 /* MenuTableViewController.swift */,
@@ -460,6 +468,7 @@
 				4984E67B2610260B00868BB0 /* PreviewVC.swift */,
 				49EF5A222616B438006845B0 /* WebViewController.swift */,
 				494A637C261AAC66004B4263 /* TransactionHistoryViewController.swift */,
+				492F824C261F872900E3AF8F /* TermsViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -665,6 +674,7 @@
 				49AE6A5E260EEB91007A3C9E /* BlurEffectContainerView.swift in Sources */,
 				4974674A261C302D00D60B94 /* Purchases.swift in Sources */,
 				492D69E4260549CF00FCDD20 /* MenuType.swift in Sources */,
+				492F824D261F872A00E3AF8F /* TermsViewController.swift in Sources */,
 				498F17E0260E9B8500545190 /* ImportWalletViewController.swift in Sources */,
 				492D69402603C1ED00FCDD20 /* SlideInTransitionAnimator.swift in Sources */,
 				4966AC2D260AF6830066908B /* WalletButtonView.swift in Sources */,
@@ -696,6 +706,7 @@
 				4966AC1F260A42540066908B /* TempViewController.swift in Sources */,
 				492D69D62605127F00FCDD20 /* FileManagerContract.swift in Sources */,
 				49DA197F260D5D8B00F84A18 /* TransactionService.swift in Sources */,
+				499E1F37261EB45200B4A07C /* LogoView.swift in Sources */,
 				49D9C40B260C79CE0014960A /* BackgroundLayer.swift in Sources */,
 				4984E67C2610260B00868BB0 /* PreviewVC.swift in Sources */,
 				4966AC24260A89440066908B /* SinglePageViewController.swift in Sources */,
@@ -731,7 +742,6 @@
 				49083FDB26152EB100CC26C9 /* SearchResultsController.swift in Sources */,
 				49746735261B92AB00D60B94 /* TransactionModel+CoreDataClass.swift in Sources */,
 				4966AC19260A422E0066908B /* UnregisteredWalletViewController.swift in Sources */,
-				49A4BDDC2605A893009E8911 /* SettingsViewController.swift in Sources */,
 				4984E679260FA49000868BB0 /* BackgroundView7.swift in Sources */,
 				4974674D261C314500D60B94 /* StoreManager.swift in Sources */,
 				49624D43260145D9006C42AF /* ContainerController.swift in Sources */,
@@ -883,6 +893,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Buroku3/Buroku3.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2RH2V33K5A;
 				INFOPLIST_FILE = "Buroku3/Supporting Files/Info.plist";
@@ -891,7 +902,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -904,6 +915,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Buroku3/Buroku3.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2RH2V33K5A;
 				INFOPLIST_FILE = "Buroku3/Supporting Files/Info.plist";
@@ -912,7 +924,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

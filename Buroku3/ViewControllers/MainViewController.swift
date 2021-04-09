@@ -22,10 +22,15 @@ class MainViewController: UIViewController {
     var lowerContainerView: UIView!
     var cameraButton: UIButton!
     var imagePickerButton: UIButton!
+    var progressContainerView: UIView!
+    var progressTitleLabel: UILabel!
     var progressView: UIProgressView!
+    var progressLabel: UILabel!
     var observation: NSKeyValueObservation?
     var fileData: Data!
-    
+    var logoView: LogoView!
+    var titleLabel: UILabel!
+
     let transactionService = TransactionService()
     let alert = Alerts()
     
@@ -46,7 +51,6 @@ class MainViewController: UIViewController {
 }
 
 extension MainViewController {
-    
     // MARK: - configureBackground
     func configureBackground() {
         backgroundView = BackgroundView7()
@@ -59,6 +63,22 @@ extension MainViewController {
     func configureUI() {
         // document picker
         documentPicker = DocumentPicker(presentationController: self, delegate: self)
+        
+        // logo view
+//        logoView = LogoView()
+//        logoView.translatesAutoresizingMaskIntoConstraints = false
+//        view.addSubview(logoView)
+        
+        titleLabel = UILabel()
+        titleLabel.text = "buroku"
+        titleLabel.sizeToFit()
+        if let roundedHeadlineDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.rounded) {
+            let roundedFont = UIFont(descriptor: roundedHeadlineDescriptor, size: 30).with(weight: .bold)
+            titleLabel.font = roundedFont
+        }
+        titleLabel.textColor = .white
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(titleLabel)
         
         // container view
         containerView = BlurEffectContainerView()
@@ -97,20 +117,65 @@ extension MainViewController {
         imagePickerButton.translatesAutoresizingMaskIntoConstraints = false
         lowerContainerView.addSubview(imagePickerButton)
         
+        // progress container view
+        progressContainerView = UIView()
+        progressContainerView.alpha = 0
+        progressContainerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(progressContainerView)
+        
+        // progress title label
+        progressTitleLabel = UILabel()
+        progressTitleLabel.text = "Uploading..."
+        progressTitleLabel.textColor = .gray
+        progressTitleLabel.font = UIFont.systemFont(ofSize: 12)
+        progressTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        progressContainerView.addSubview(progressTitleLabel)
+        
+        // progress view
         progressView = UIProgressView(progressViewStyle: .bar)
         progressView.progress = 0.0
+        progressView.tintColor = .black
         progressView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(progressView)
+        progressContainerView.addSubview(progressView)
+        
+        // progress label
+        progressLabel = UILabel()
+        progressLabel.textAlignment = .right
+        progressLabel.textColor = .gray
+        progressLabel.font = UIFont.systemFont(ofSize: 12)
+        progressLabel.translatesAutoresizingMaskIntoConstraints = false
+        progressContainerView.addSubview(progressLabel)
     }
     
     // MARK: - setConstraints
     func setConstraints() {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                containerView.heightAnchor.constraint(equalToConstant: 400),
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                // container view
+                containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+                containerView.heightAnchor.constraint(equalToConstant: 300),
+            ])
+        }
+        
         NSLayoutConstraint.activate([
-            // container view
-            containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            containerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-            containerView.heightAnchor.constraint(equalToConstant: 300),
+            // logo view
+//            logoView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: -50),
+//            logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -5),
+//            logoView.widthAnchor.constraint(equalToConstant: 80),
+//            logoView.heightAnchor.constraint(equalToConstant: 80),
+            
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: UIScreen.main.bounds.height / 5),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             // document browse button
             documentBrowseButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 50),
@@ -136,10 +201,26 @@ extension MainViewController {
             imagePickerButton.heightAnchor.constraint(equalTo: imagePickerButton.widthAnchor),
             imagePickerButton.centerYAnchor.constraint(equalTo: lowerContainerView.centerYAnchor),
             
+            progressContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
+            progressContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            progressContainerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+            progressContainerView.heightAnchor.constraint(equalToConstant: 200),
+            
+            // progress title label
+            progressTitleLabel.centerYAnchor.constraint(equalTo: progressContainerView.centerYAnchor, constant: -50),
+            progressTitleLabel.centerXAnchor.constraint(equalTo: progressContainerView.centerXAnchor),
+            progressTitleLabel.widthAnchor.constraint(equalTo: progressContainerView.widthAnchor, multiplier: 1),
+            
             // progress view
-            progressView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100),
-            progressView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            progressView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8)
+            progressView.centerYAnchor.constraint(equalTo: progressContainerView.centerYAnchor),
+            progressView.centerXAnchor.constraint(equalTo: progressContainerView.centerXAnchor),
+            progressView.widthAnchor.constraint(equalTo: progressContainerView.widthAnchor, multiplier: 1),
+            
+            // progress label
+            progressLabel.centerXAnchor.constraint(equalTo: progressContainerView.centerXAnchor),
+            progressLabel.centerYAnchor.constraint(equalTo: progressContainerView.centerYAnchor, constant: 50),
+            progressLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 20),
+            progressLabel.widthAnchor.constraint(equalTo: progressContainerView.widthAnchor, multiplier: 0.8),
         ])
     }
     
@@ -182,7 +263,9 @@ extension MainViewController: UIImagePickerControllerDelegate & UINavigationCont
         
         alert.withTextField(delegate: self, controller: self, image: image) { [weak self] (title, password) in
 //            self?.uploadFile(fileData: image, title: title, password: password)
-            self?.uploadImage(image: image, title: title, password: password)
+            self?.presendAnimation(completion: {
+                self?.uploadImage(image: image, title: title, password: password)
+            })
         }
     }
     
@@ -222,7 +305,10 @@ extension MainViewController: QLPreviewControllerDataSource, QLPreviewController
                 if let data = retrievedData {
                     self?.alert.withTextField(delegate: self!, controller: self!, data: data, completion: { (title, password) in
 //                        self?.uploadFile(fileData: data, title: title, password: password)
-                        self?.uploadData(data: data, title: title, password: password)
+                        
+                        self?.presendAnimation(completion: {
+                            self?.uploadData(data: data, title: title, password: password)
+                        })
                     })
                 }
             }
@@ -295,9 +381,10 @@ extension MainViewController: UITextFieldDelegate {
             }
         })
         
-        observation = task.progress.observe(\.fractionCompleted) { progress, _ in
+        observation = task.progress.observe(\.fractionCompleted) { [weak self](progress, _) in
             DispatchQueue.main.async {
-                self.progressView.progress = Float(progress.fractionCompleted)
+                self?.progressView.progress = Float(progress.fractionCompleted)
+                self?.progressLabel.text = String(Int(progress.fractionCompleted * 100)) + "%"
             }
         }
         
@@ -330,17 +417,17 @@ extension MainViewController: UITextFieldDelegate {
                 debugPrint("response", response)
             }
             
-            let contentType = response.allHeaderFields["Content-Type"] as? String
-            print("contentType", contentType)
+//            let contentType = response.allHeaderFields["Content-Type"] as? String
             
             if let data = data {
                 self.uploadToBlockchain(data: data, title: title, password: password, txType: .docUploaded)
             }
         })
         
-        observation = task.progress.observe(\.fractionCompleted) { progress, _ in
+        observation = task.progress.observe(\.fractionCompleted) { [weak self](progress, _) in
             DispatchQueue.main.async {
-                self.progressView.progress = Float(progress.fractionCompleted)
+                self?.progressView.progress = Float(progress.fractionCompleted)
+                self?.progressLabel.text = String(Int(progress.fractionCompleted * 100)) + "%"
             }
         }
         
@@ -380,7 +467,6 @@ extension MainViewController: UITextFieldDelegate {
         data.append(fileData)
         data.append("\r\n")
         data.append("------\(boundary)--")
-        print("body", data)
         request.httpBody = data
         
         DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated).sync {
@@ -403,10 +489,8 @@ extension MainViewController: UITextFieldDelegate {
     
     // MARK: - uploadToBlockchain
     func uploadToBlockchain(data: Data, title: String, password: String, txType: TransactionType) {
-        print("data", data)
         do {
             if let responseObj = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue:0)) as? [String:Any] {
-                print("response", responseObj)
                 if let status = responseObj["ipfs success"] as? [String: Any],
                    let path = status["path"],
                    let size = status["size"] as? NSNumber {
@@ -448,37 +532,74 @@ extension MainViewController: UITextFieldDelegate {
                                     }
                                     
                                     DispatchQueue.main.async {
-                                        let finalAC = UIAlertController(title: "Success!", message: "Your file has been uploaded to the blockchain.", preferredStyle: .alert)
-                                        finalAC.addAction(UIAlertAction(title: "OK", style: .default))
-                                        self?.present(finalAC, animated: true, completion: {
-                                            
-                                            let localDatabase = LocalDatabase()
-                                            if let wallet = localDatabase.getWallet() {
-                                                localDatabase.saveTransactionDetail(walletAddress: wallet.address,txHash: result.hash, fileHash: path, date: Date(), txType: txType)
-                                                
-                                                // Core Spotlight indexing for Progress
-                                                let attributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-                                                attributeSet.title = title
-                                                attributeSet.contentCreationDate = Date()
-                                                attributeSet.contentDescription = path
-                                                let titleKeywords =  title.components(separatedBy: " ")
-                                                var keywordsArr = ["productivity", "goal setting", "habit"]
-                                                for keyword in titleKeywords {
-                                                    keywordsArr.append(keyword)
-                                                }
-                                                attributeSet.keywords = keywordsArr
-                                                
-                                                let progressItem = CSSearchableItem(uniqueIdentifier: "\(result.hash)", domainIdentifier: "com.ovis.Buroku3", attributeSet: attributeSet)
-                                                progressItem.expirationDate = Date.distantFuture
-                                                CSSearchableIndex.default().indexSearchableItems([progressItem]) { (error) in
-                                                    if let error = error {
-                                                        print("Indexing error: \(error.localizedDescription)")
-                                                    } else {
-                                                        print("Search item for Progress successfully indexed")
+                                        let detailVC = DetailViewController(height: 200)
+                                        detailVC.titleString = "Success!"
+                                        detailVC.message = "Your file has been uploaded to the blockchain."
+                                        detailVC.buttonAction = { _ in
+                                            self?.dismiss(animated: true, completion: nil)
+                                        }
+                                        
+                                        self?.present(detailVC, animated: true) {
+                                            self?.presendAnimation(isReversed: true, completion: {
+                                                let localDatabase = LocalDatabase()
+                                                if let wallet = localDatabase.getWallet() {
+                                                    localDatabase.saveTransactionDetail(walletAddress: wallet.address,txHash: result.hash, fileHash: path, date: Date(), txType: txType)
+                                                    
+                                                    let attributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+                                                    attributeSet.title = title
+                                                    attributeSet.contentCreationDate = Date()
+                                                    attributeSet.contentDescription = path
+                                                    let titleKeywords =  title.components(separatedBy: " ")
+                                                    var keywordsArr = ["productivity", "goal setting", "habit"]
+                                                    for keyword in titleKeywords {
+                                                        keywordsArr.append(keyword)
+                                                    }
+                                                    attributeSet.keywords = keywordsArr
+                                                    
+                                                    let uploadedItem = CSSearchableItem(uniqueIdentifier: "\(result.hash)", domainIdentifier: "com.ovis.Buroku3", attributeSet: attributeSet)
+                                                    uploadedItem.expirationDate = Date.distantFuture
+                                                    CSSearchableIndex.default().indexSearchableItems([uploadedItem]) { (error) in
+                                                        if let error = error {
+                                                            print("Indexing error: \(error.localizedDescription)")
+                                                        } else {
+                                                            print("Search item for Progress successfully indexed")
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        })
+                                            })
+                                        }
+                                        
+//                                        let finalAC = UIAlertController(title: "Success!", message: "Your file has been uploaded to the blockchain.", preferredStyle: .alert)
+//                                        finalAC.addAction(UIAlertAction(title: "OK", style: .default))
+//                                        self?.present(finalAC, animated: true, completion: {
+//
+//                                            let localDatabase = LocalDatabase()
+//                                            if let wallet = localDatabase.getWallet() {
+//                                                localDatabase.saveTransactionDetail(walletAddress: wallet.address,txHash: result.hash, fileHash: path, date: Date(), txType: txType)
+//
+//                                                // Core Spotlight indexing for Progress
+//                                                let attributeSet = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+//                                                attributeSet.title = title
+//                                                attributeSet.contentCreationDate = Date()
+//                                                attributeSet.contentDescription = path
+//                                                let titleKeywords =  title.components(separatedBy: " ")
+//                                                var keywordsArr = ["productivity", "goal setting", "habit"]
+//                                                for keyword in titleKeywords {
+//                                                    keywordsArr.append(keyword)
+//                                                }
+//                                                attributeSet.keywords = keywordsArr
+//
+//                                                let progressItem = CSSearchableItem(uniqueIdentifier: "\(result.hash)", domainIdentifier: "com.ovis.Buroku3", attributeSet: attributeSet)
+//                                                progressItem.expirationDate = Date.distantFuture
+//                                                CSSearchableIndex.default().indexSearchableItems([progressItem]) { (error) in
+//                                                    if let error = error {
+//                                                        print("Indexing error: \(error.localizedDescription)")
+//                                                    } else {
+//                                                        print("Search item for Progress successfully indexed")
+//                                                    }
+//                                                }
+//                                            }
+//                                        })
                                     }
                                 } catch Web3Error.nodeError(let desc) {
                                     if let index = desc.firstIndex(of: ":") {
@@ -504,10 +625,56 @@ extension MainViewController: UITextFieldDelegate {
             }
         }
     }
+    
+    func presendAnimation(isReversed: Bool = false, completion: @escaping () -> Void) {
+        let totalCount = 3
+//        let duration = 1.0 / Double(totalCount)
+        let duration = Double(0.5)
+        
+        let animation = UIViewPropertyAnimator(duration: 0.5, timingParameters: UICubicTimingParameters())
+        animation.addAnimations {
+            
+            switch isReversed {
+                case false:
+                    UIView.animateKeyframes(withDuration: 0, delay: 0, animations: { [weak self] in
+                        UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: duration) {
+                            self?.titleLabel.alpha = 0
+                        }
+                        
+                        UIView.addKeyframe(withRelativeStartTime: 1/Double(totalCount), relativeDuration: duration) {
+//                            self?.containerView.center = CGPoint(x: self!.view.bounds.size.width / 2, y: 250)
+                            self?.containerView.transform = CGAffineTransform(translationX: 0, y: -100)
+                        }
+                        
+                        UIView.addKeyframe(withRelativeStartTime: 1.5/Double(totalCount), relativeDuration: duration) {
+                            self?.progressContainerView.alpha = 1
+                        }
+                    })
+                    
+                    completion()
+                case true:
+                    UIView.animateKeyframes(withDuration: 0, delay: 0, animations: { [weak self] in
+                        UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.2) {
+                            self?.progressContainerView.alpha = 0
+                        }
+
+                        UIView.addKeyframe(withRelativeStartTime: 1 / Double(totalCount), relativeDuration: duration) {
+                            self?.containerView.transform = .identity
+                        }
+                        
+                        UIView.addKeyframe(withRelativeStartTime: 2 / Double(totalCount), relativeDuration: duration) {
+                            self?.titleLabel.alpha = 1
+                        }
+                    })
+                    completion()
+            }
+        }
+        
+        animation.startAnimation()
+    }
 }
 
 enum MethodHttp: String {
     case get = "GET"
     case post = "POST"
 }
-

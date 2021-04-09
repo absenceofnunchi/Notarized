@@ -12,8 +12,10 @@
 import UIKit
 
 class BackgroundView7: UIView {
-    let startingColor = UIColor(red: 163/255, green: 196/255, blue: 204/255, alpha: 1).cgColor
-    let finishingColor = UIColor(red: 75/255, green: 120/255, blue: 136/255, alpha: 1).cgColor
+//    let startingColor = UIColor(red: 163/255, green: 196/255, blue: 204/255, alpha: 1).cgColor
+//    let finishingColor = UIColor(red: 75/255, green: 120/255, blue: 136/255, alpha: 1).cgColor
+    let startingColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1).cgColor
+    let finishingColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 0.8).cgColor
     
     init() {
         super.init(frame: .zero)
@@ -37,7 +39,7 @@ extension BackgroundView7 {
         let gradientLayer = CAGradientLayer()
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 1)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0)
-        gradientLayer.colors = [finishingColor, startingColor]
+        gradientLayer.colors = [startingColor, finishingColor]
         gradientLayer.frame = self.bounds
         gradientLayer.mask = circleShapeLayer
 
