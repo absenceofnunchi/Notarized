@@ -139,6 +139,7 @@ extension CreateWalletViewController {
         
         // passwords don't match label
         passwordsDontMatch = UILabel()
+        passwordsDontMatch.sizeToFit()
         passwordsDontMatch.translatesAutoresizingMaskIntoConstraints = false
         passwordsDontMatch.isHidden = true
         view.addSubview(passwordsDontMatch)
@@ -214,7 +215,7 @@ extension CreateWalletViewController {
             // paswords don't match label
             passwordsDontMatch.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),
             passwordsDontMatch.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            passwordsDontMatch.widthAnchor.constraint(equalToConstant: 100),
+//            passwordsDontMatch.widthAnchor.constraint(equalToConstant: 100),
             passwordsDontMatch.heightAnchor.constraint(equalToConstant: 50),
             
             // password text field

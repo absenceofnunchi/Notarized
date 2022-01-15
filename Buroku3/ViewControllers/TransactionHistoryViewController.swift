@@ -84,6 +84,7 @@ extension TransactionHistoryViewController {
         let datum = data[indexPath.row]
         
         let webVC = WebViewController(navBarTintColor: UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1))
+        webVC.navBarTintColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
 //        webVC.navBarTintColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
         webVC.urlString = "https://etherscan.io/tx/" + datum.transactionHash
         self.navigationController?.pushViewController(webVC, animated: true)

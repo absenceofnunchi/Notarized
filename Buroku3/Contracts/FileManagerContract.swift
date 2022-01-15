@@ -9,22 +9,17 @@ import Foundation
 import web3swift
 
 // MARK: - FileManager
+//let fileManagerContractAddress = EthereumAddress("0x3a3596b99a90937ce2c87502d977686bdae3b734")
 let fileManagerContractAddress = EthereumAddress("0x01F4f8E268f278C9e4DB60B7d4Ff83a367d35697")
+
 let fileManagerABI = """
 [
     {
-        "inputs": [],
-        "name": "deleteAllFiles",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
-                "internalType": "uint256",
+                "internalType": "uint16",
                 "name": "_index",
-                "type": "uint256"
+                "type": "uint16"
             }
         ],
         "name": "deleteFile",
@@ -49,24 +44,19 @@ let fileManagerABI = """
                         "type": "string"
                     },
                     {
-                        "internalType": "bool",
-                        "name": "isActive",
-                        "type": "bool"
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
                     },
                     {
-                        "internalType": "uint256",
+                        "internalType": "uint16",
                         "name": "index",
-                        "type": "uint256"
+                        "type": "uint16"
                     },
                     {
                         "internalType": "uint32",
                         "name": "size",
                         "type": "uint32"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
                     }
                 ],
                 "internalType": "struct FileManager.File[]",
@@ -100,99 +90,24 @@ let fileManagerABI = """
                         "type": "string"
                     },
                     {
-                        "internalType": "bool",
-                        "name": "isActive",
-                        "type": "bool"
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
                     },
                     {
-                        "internalType": "uint256",
+                        "internalType": "uint16",
                         "name": "index",
-                        "type": "uint256"
+                        "type": "uint16"
                     },
                     {
                         "internalType": "uint32",
                         "name": "size",
                         "type": "uint32"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
                     }
                 ],
                 "internalType": "struct FileManager.File",
                 "name": "",
                 "type": "tuple"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_ipfsHash",
-                "type": "string"
-            }
-        ],
-        "name": "getFileWithHash",
-        "outputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "string",
-                        "name": "ipfsHash",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "date",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "isActive",
-                        "type": "bool"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "index",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint32",
-                        "name": "size",
-                        "type": "uint32"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
-                    }
-                ],
-                "internalType": "struct FileManager.File",
-                "name": "file",
-                "type": "tuple"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "index",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",

@@ -15,6 +15,7 @@ class UnregisteredWalletViewController: UIViewController {
     var walletLogoImageView: UIImageView!
     var imageContainerView: UIView!
     var backgroundAnimator: UIViewPropertyAnimator!
+    var isOpened = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,6 +42,13 @@ class UnregisteredWalletViewController: UIViewController {
         )
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if !isOpened {
+            configureAnnouncment()
+        }
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
@@ -61,6 +69,17 @@ class UnregisteredWalletViewController: UIViewController {
 }
 
 extension UnregisteredWalletViewController {
+    func configureAnnouncment() {
+        let detailVC = DetailViewController()
+        detailVC.titleString = "Important!"
+        detailVC.message = "Please take care to record your password as well as the private key for your wallet. You will not be able to recover them once they are lost."
+        detailVC.buttonAction = { [weak self] _ in
+            self?.isOpened = true
+            self?.dismiss(animated: true, completion: nil)
+        }
+        self.present(detailVC, animated: true, completion: nil)
+    }
+    
     // MARK: - ConfigureUI
     /// If the user doesn't have a wallet
     func configureUI() {

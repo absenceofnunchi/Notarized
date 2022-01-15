@@ -40,15 +40,6 @@ class FileDetailViewController: UITableViewController {
             
             parsedData.append(pd)
         }
-        
-//        let previewButtonCell = ParsedData(key: "", value: "Preview File")
-//        parsedData.append(previewButtonCell)
-//
-//        let detailButtonCell = ParsedData(key: "", value: "View Transaction Details")
-//        parsedData.append(detailButtonCell)
-//
-//        let deleteButtonCell = ParsedData(key: "", value: "Delete")
-//        parsedData.append(deleteButtonCell)
     }
     
     required init?(coder: NSCoder) {
@@ -59,10 +50,69 @@ class FileDetailViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableView()
+        configureNavigationBar()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        configureNavigationBar()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        configureNavigationBar(isVisible: false)
     }
 }
 
 extension FileDetailViewController {
+    func configureNavigationBar(isVisible: Bool = true) {
+        let navItem = rootViewController.children[0].navigationItem
+        if isVisible {
+            if #available(iOS 14, *) {
+                let barButtonMenu = UIMenu(title: "", image: nil, children: [
+                    UIAction(title: NSLocalizedString("Share the Hash", comment: ""), image: nil,handler: menuHandler(action:)),
+                    UIAction(title: NSLocalizedString("Share IPFS", comment: ""), image: nil, handler: menuHandler(action:))
+                ])
+                navItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "square.and.arrow.up"), primaryAction: nil, menu: barButtonMenu)
+            } else {
+                navItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(sharePressed))
+            }
+        } else {
+            navItem.setRightBarButtonItems(nil, animated: true)
+//            if #available(iOS 14, *) {
+//                navItem.rightBarButtonItem?.menu = nil
+//            } else {
+//                navItem.rightBarButtonItem = nil
+//            }
+        }
+    }
+    
+    func menuHandler(action: UIAction) {
+        switch action.title {
+            case NSLocalizedString("Share the hash", comment: ""):
+                activityVC(activityItem: self.data.hash)
+            case NSLocalizedString("Share IPFS", comment: ""):
+                activityVC(activityItem: "https://ipfs.io/ipfs/\(self.data.hash)")
+            default:
+                break
+        }
+        Swift.debugPrint("Menu handler: \(action.title)")
+    }
+    
+    @objc func sharePressed() {
+        activityVC(activityItem: "https://ipfs.io/ipfs/\(self.data.hash)")
+    }
+    
+    func activityVC(activityItem: String) {
+        let shareSheetVC = UIActivityViewController(activityItems: [activityItem], applicationActivities: nil)
+        self.present(shareSheetVC, animated: true, completion: nil)
+        if let pop = shareSheetVC.popoverPresentationController {
+            pop.sourceView = self.view
+            //                pop.sourceRect = CGRect(x: self?.view.bounds.midX, y: self?.view.bounds.height, width: 0, height: 0)
+            pop.permittedArrowDirections = []
+        }
+    }
+    
     func configureTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: Cell.fileDetailCell)
         tableView.register(ButtonCell.self, forCellReuseIdentifier: Cell.buttonCell)

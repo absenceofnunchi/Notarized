@@ -62,7 +62,8 @@ extension TransDetailTableViewController {
                 cell.selectionStyle = .none
                 cell.buttonAction = { [weak self] in
                     let webVC = WebViewController(navBarTintColor: UIColor.white)
-//                    webVC.navBarTintColor = UIColor.white
+                    webVC.navBarTintColor = .white
+                    webVC.navBgColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
                     webVC.urlString = "https://etherscan.io/tx/0x\(self?.data[0].value ?? "")"
                     self?.navigationController?.pushViewController(webVC, animated: true)
                 }

@@ -19,7 +19,7 @@ class Web3swiftService {
     }
     
 //    static var web3instance: web3 {
-//        let web3Ropsten = Web3.InfuraRopstenWeb3()
+//        let web3Ropsten = Web3.InfuraMainnetWeb3()
 //        web3Ropsten.addKeystoreManager(self.keyservice.keystoreManager())
 //        return web3Ropsten
 //    }

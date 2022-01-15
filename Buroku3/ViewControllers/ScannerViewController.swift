@@ -12,10 +12,43 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     weak var delegate: ScannerDelegate?
+    var closeButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureCapture()
+        configureUI()
+        setConstraints()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if (captureSession?.isRunning == false) {
+            captureSession.startRunning()
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if (captureSession?.isRunning == true) {
+            captureSession.stopRunning()
+        }
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+}
+
+extension ScannerViewController {
+    func configureCapture() {
         view.backgroundColor = UIColor.black
         captureSession = AVCaptureSession()
         
@@ -55,27 +88,38 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         captureSession.startRunning()
     }
     
+    func configureUI () {
+        // close button
+        guard let closeButtonImage = UIImage(systemName: "multiply") else {
+            self.dismiss(animated: true, completion: nil)
+            return
+        }
+        
+        closeButton = UIButton.systemButton(with: closeButtonImage, target: self, action: #selector(buttonHandler))
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        closeButton.tintColor = .black
+        view.addSubview(closeButton)
+    }
+    
+    func setConstraints() {
+        NSLayoutConstraint.activate([
+            // close button
+            closeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            closeButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            closeButton.widthAnchor.constraint(equalToConstant: 60),
+            closeButton.heightAnchor.constraint(equalToConstant: 60),
+        ])
+    }
+    
+    @objc func buttonHandler() {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     func failed() {
         let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         captureSession = nil
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        if (captureSession?.isRunning == false) {
-            captureSession.startRunning()
-        }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if (captureSession?.isRunning == true) {
-            captureSession.stopRunning()
-        }
     }
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -89,13 +133,5 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         }
         
         dismiss(animated: true)
-    }
-    
-    override var prefersStatusBarHidden: Bool {
-        return true
-    }
-    
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
     }
 }

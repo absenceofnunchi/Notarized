@@ -107,6 +107,10 @@ extension ContainerViewController: ContainerDelegate {
                     }
                     return
                 }
+            case .terms:
+                let webVC = WebViewController()
+                webVC.urlString = "https://sites.google.com/view/buroku/home"
+                newPageVC = webVC
             default:
                 let destinationVC = menuType.VCType
                 newPageVC = destinationVC.init()

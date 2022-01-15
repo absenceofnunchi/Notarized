@@ -9,12 +9,23 @@ import UIKit
 
 class MenuTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var customTableView: UITableView!
-    let allMenu: [Menu] = [
+    var docImage: UIImage {
+        var imageName: String!
+        if #available(iOS 14, *) {
+            imageName = "doc.badge.gearshape"
+        } else {
+            imageName = "doc.plaintext"
+        }
+        return UIImage(systemName: imageName)!
+    }
+    
+    lazy var allMenu: [Menu] = [
         Menu(symbol: UIImage(systemName: "paperplane")!.withRenderingMode(.alwaysOriginal), title: "Upload Files"),
         Menu(symbol: UIImage(systemName: "square.stack.3d.up")!.withRenderingMode(.alwaysOriginal), title: "Files on Blockchain"),
         Menu(symbol: UIImage(systemName: "creditcard")!.withRenderingMode(.alwaysOriginal), title: "Wallet"),
         Menu(symbol: UIImage(systemName: "eye")!.withRenderingMode(.alwaysOriginal), title: "View on Etherscan"),
-        Menu(symbol: UIImage(systemName: "list.bullet")!.withRenderingMode(.alwaysOriginal), title: "Transaction History")
+        Menu(symbol: UIImage(systemName: "list.bullet")!.withRenderingMode(.alwaysOriginal), title: "Transaction History"),
+        Menu(symbol: self.docImage.withRenderingMode(.alwaysOriginal), title: "Terms of Service")
     ]
     var didTapMenuType: ((MenuType) -> Void)?
     weak var delegate: ContainerDelegate?
@@ -46,7 +57,7 @@ class MenuTableViewController: UIViewController, UITableViewDelegate, UITableVie
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 5
+        return 6
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

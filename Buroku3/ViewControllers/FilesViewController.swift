@@ -74,8 +74,6 @@ extension FilesViewController {
                     do {
                         let results = try transaction.call()
                         
-                        print("results", results)
-                        
                         for (_, value) in results {
                             let valueObject = (value as! [[Any]])
                             self?.data.removeAll()
@@ -84,7 +82,7 @@ extension FilesViewController {
                                 if let hash = vo[0] as? String,
                                    let date = vo[1] as? String,
                                    let indexBigInt = vo[3] as? BigUInt,
-                                   let name = vo[5] as? String,
+                                   let name = vo[2] as? String,
                                    let size = vo[4] as? BigUInt {
                                     let sizeString = String(size)
                                     let index = Int(indexBigInt)
@@ -314,7 +312,15 @@ extension FilesViewController: UITextFieldDelegate {
                     do {
                         let _ = try transaction.send(password: password, transactionOptions: nil)
                         DispatchQueue.main.async {
-                            self?.tableView.reloadData()
+                            let detailVC = DetailViewController(height: 200)
+                            detailVC.titleString = "Success!"
+                            detailVC.message = "Your file has been successfully deleted. It will take about 15 seconds to be reflected."
+                            detailVC.buttonAction = { _ in
+                                self?.dismiss(animated: true) {
+                                    self?.tableView.reloadData()
+                                }
+                            }
+                            self?.present(detailVC, animated: true, completion: nil)
                         }
 
                         CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: ["\(file.hash)"]) { (error) in

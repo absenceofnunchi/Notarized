@@ -12,12 +12,14 @@ class ImportWalletViewController: UIViewController {
     var closeButton: UIButton!
     var importButton: UIButton!
     var containerView: BlurEffectContainerView!
+    var subContainerView: UIView!
     var backgroundView: BackgroundView6!
     var enterPrivateKeyTextField: UITextField!
     var passwordTextField: UITextField!
     var textFields = [UITextField]()
     let animationView = AnimationView()
     var warningLabel: UILabel!
+    var scanButton: UIButton!
 
     weak var delegate: WalletDelegate?
     let keyService = KeysService()
@@ -35,6 +37,10 @@ class ImportWalletViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        if animationView != nil {
+            animationView.play()
+        }
         
         let totalCount = 4
         let duration = 1.0 / Double(totalCount)
@@ -144,6 +150,12 @@ extension ImportWalletViewController {
         containerView.layer.zPosition = 100
         view.addSubview(containerView)
         
+        // sub container view
+        subContainerView = UIView()
+        subContainerView.translatesAutoresizingMaskIntoConstraints = false
+        subContainerView.backgroundColor = .clear
+        containerView.addSubview(subContainerView)
+        
         // repeat password text field
         passwordTextField = UITextField()
         passwordTextField.delegate = self
@@ -154,19 +166,30 @@ extension ImportWalletViewController {
         textFields.append(passwordTextField)
         passwordTextField.setLeftPaddingPoints(10)
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(passwordTextField)
+        subContainerView.addSubview(passwordTextField)
         
         // enter private key
         enterPrivateKeyTextField = UITextField()
         enterPrivateKeyTextField.delegate = self
         enterPrivateKeyTextField.layer.borderWidth = 1
         enterPrivateKeyTextField.layer.cornerRadius = 10
-        enterPrivateKeyTextField.placeholder = "Enter your private key"
+        enterPrivateKeyTextField.placeholder = "Private key"
         enterPrivateKeyTextField.layer.borderColor = UIColor.lightGray.cgColor
         enterPrivateKeyTextField.setLeftPaddingPoints(10)
         textFields.append(enterPrivateKeyTextField)
         enterPrivateKeyTextField.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(enterPrivateKeyTextField)
+        subContainerView.addSubview(enterPrivateKeyTextField)
+        
+        guard let scanButtonImage = UIImage(systemName: "qrcode.viewfinder") else { return }
+        scanButton = UIButton.systemButton(with: scanButtonImage.withTintColor(.lightGray, renderingMode: .alwaysOriginal), target: self, action: #selector(buttonHandler(_:)))
+//        scanButton.backgroundColor = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
+        scanButton.backgroundColor = .clear
+        scanButton.layer.cornerRadius = 7
+        scanButton.tag = 3
+        scanButton.layer.borderWidth = 1
+        scanButton.layer.borderColor = UIColor.lightGray.cgColor
+        scanButton.translatesAutoresizingMaskIntoConstraints = false
+        subContainerView.addSubview(scanButton)
         
         // create wallet button
         importButton = UIButton()
@@ -177,7 +200,7 @@ extension ImportWalletViewController {
         importButton.layer.cornerRadius = 10
         importButton.isEnabled = false
         importButton.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(importButton)
+        subContainerView.addSubview(importButton)
     }
     
     func setConstraints() {
@@ -200,6 +223,12 @@ extension ImportWalletViewController {
         }
         
         NSLayoutConstraint.activate([
+            // sub container view
+            subContainerView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            subContainerView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            subContainerView.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.8),
+            subContainerView.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 1),
+            
             // close button
             closeButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             closeButton.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
@@ -218,21 +247,27 @@ extension ImportWalletViewController {
             
             // password text field
             passwordTextField.bottomAnchor.constraint(equalTo: enterPrivateKeyTextField.topAnchor, constant: -50),
-            passwordTextField.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            passwordTextField.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.8),
+            passwordTextField.centerXAnchor.constraint(equalTo: subContainerView.centerXAnchor),
+            passwordTextField.widthAnchor.constraint(equalTo: subContainerView.widthAnchor, multiplier: 1),
             passwordTextField.heightAnchor.constraint(equalToConstant: 50),
             
             // enterPrivateKeyTextField text field
-            enterPrivateKeyTextField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            enterPrivateKeyTextField.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
-            enterPrivateKeyTextField.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.8),
+            enterPrivateKeyTextField.centerYAnchor.constraint(equalTo: subContainerView.centerYAnchor),
+            enterPrivateKeyTextField.leadingAnchor.constraint(equalTo: subContainerView.leadingAnchor),
+            enterPrivateKeyTextField.trailingAnchor.constraint(equalTo: scanButton.leadingAnchor, constant: -10),
             enterPrivateKeyTextField.heightAnchor.constraint(equalToConstant: 50),
+            
+            // scan button
+            scanButton.centerYAnchor.constraint(equalTo: subContainerView.centerYAnchor),
+            scanButton.trailingAnchor.constraint(equalTo: subContainerView.trailingAnchor, constant: 0),
+            scanButton.heightAnchor.constraint(equalToConstant: 50),
+            scanButton.widthAnchor.constraint(equalTo: scanButton.heightAnchor, multiplier: 1),
             
             // import wallet button
             importButton.topAnchor.constraint(equalTo: enterPrivateKeyTextField.bottomAnchor, constant: 50),
-            importButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.8),
+            importButton.widthAnchor.constraint(equalTo: subContainerView.widthAnchor, multiplier: 1),
             importButton.heightAnchor.constraint(equalToConstant: 50),
-            importButton.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            importButton.centerXAnchor.constraint(equalTo: subContainerView.centerXAnchor),
         ])
     }
     
@@ -245,6 +280,11 @@ extension ImportWalletViewController {
                 self.dismiss(animated: true, completion: nil)
             case 2:
                 importWallet()
+            case 3:
+                let scannerVC = ScannerViewController()
+                scannerVC.delegate = self
+                scannerVC.modalPresentationStyle = .fullScreen
+                self.present(scannerVC, animated: true, completion: nil)
             default:
                 break
         }
@@ -332,5 +372,13 @@ extension ImportWalletViewController {
                 self?.dismiss(animated: true, completion: nil)
             }
         }
+    }
+}
+
+extension ImportWalletViewController: ScannerDelegate {
+    
+    // MARK: - scannerDidOutput
+    func scannerDidOutput(code: String) {
+        enterPrivateKeyTextField.text = code
     }
 }

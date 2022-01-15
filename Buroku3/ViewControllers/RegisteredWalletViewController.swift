@@ -19,11 +19,6 @@ class RegisteredWalletViewController: UIViewController {
     
     let localDatabase = LocalDatabase()
     let keyservice = KeysService()
-    var web3instance: web3 {
-        let web3 = Web3.InfuraRinkebyWeb3()
-        web3.addKeystoreManager(self.keyservice.keystoreManager())
-        return web3
-    }
     let transactionService = TransactionService()
     let alert = Alerts()
     

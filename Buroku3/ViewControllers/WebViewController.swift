@@ -14,6 +14,7 @@ class WebViewController: UIViewController {
     let alert = Alerts()
 //    var navBarTintColor: UIColor! = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)
     var navBarTintColor: UIColor!
+    var navBgColor: UIColor!
     
     init(navBarTintColor: UIColor? = UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1)) {
         super.init(nibName: nil, bundle: nil)
@@ -37,28 +38,39 @@ class WebViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        self.navigationController?.navigationBar.tintColor = navBarTintColor
-        
-        if let parent = self.parent {
-            parent.navigationController?.navigationBar.tintColor = navBarTintColor
-        }
+        configureNavigationBar(color: navBarTintColor ?? UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 1), bgColor: navBgColor ?? UIColor.white)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        self.navigationController?.navigationBar.tintColor = .white
-
-        if let parent = self.parent {
-            parent.navigationController?.navigationBar.tintColor = .white
-        }
+//        configureNavigationBar(color: .white, bgColor: .clear)
+        configureNavigationBar()
     }
+
 }
 
 
 // MARK: - Configure web view
 extension WebViewController {
+    func configureNavigationBar(color: UIColor, bgColor: UIColor) {
+        self.navigationController?.navigationBar.tintColor = color
+        self.navigationController?.navigationBar.standardAppearance.backgroundColor = bgColor
+//        if let parent = self.parent {
+//            let navigationBar = parent.navigationController?.navigationBar
+//            navigationBar?.tintColor = color
+//            navigationBar?.standardAppearance.backgroundColor = bgColor
+//        }
+    }
+    
+    func configureNavigationBar() {
+        if let parent = self.parent {
+            let navigationBar = parent.navigationController?.navigationBar
+            navigationBar?.tintColor = .white
+            navigationBar?.standardAppearance.backgroundColor = .clear
+        }
+    }
+    
+    
     func configureWebView() {
         if let url = URL(string: urlString) {
             webView.load(URLRequest(url: url))
