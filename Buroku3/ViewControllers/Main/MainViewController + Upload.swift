@@ -1,9 +1,14 @@
 //
-//  MainViewController + UploadImage.swift
+//  MainViewController + Upload.swift
 //  Buroku3
 //
 //  Created by J C on 2022-01-13.
 //
+
+/*
+ Abstract:
+ Upload extension for MainVC. Uploads both images and files to IPFS and then to the blockchain using the CID.
+ */
 
 import UIKit
 import Combine
@@ -121,7 +126,7 @@ extension MainViewController {
                     let df = DateFormatter()
                     df.dateFormat = "yyyy-MM-dd HH:mm:ss"
                     let dateString = df.string(from: date)
-                    let title: String = "title"
+                    let title: String = "0"
                     let parameters: [AnyObject] = [path, dateString, size.intValue, title] as [AnyObject]
                     return parameters
                 } catch {
@@ -133,14 +138,14 @@ extension MainViewController {
     }
     
     func uploadAndGetEstimate<T>(data: T) -> AnyPublisher<TxPackage, PostingError> {
-        Deferred { [weak self] () -> AnyPublisher<[AnyObject], PostingError>  in
+        self.activityStartAnimating(activityColor: UIColor.darkGray, backgroundColor: UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.5))
+        return Deferred { [weak self] () -> AnyPublisher<[AnyObject], PostingError>  in
             return self?.uploadToIPFS(data) ?? Fail(error: PostingError.generalError(reason: "Unable to upload to IPFS."))
                 .eraseToAnyPublisher()
         }
         .eraseToAnyPublisher()
         .flatMap { [weak self] (param) -> AnyPublisher<TxPackage, PostingError>  in
-            print("param", param)
-
+            self?.activityStopAnimating()
             return Future<TxPackage, PostingError> { [weak self] promise in
                 self?.transactionService.prepareTransactionForSettingFile(
                     .setFile,
@@ -186,18 +191,6 @@ extension MainViewController {
                 fieldViewHeight: 40,
                 messageTextAlignment: .left,
                 alertStyle: .noButton
-            ),
-            StandardAlertContent(
-                index: 2,
-                titleString: "Tip",
-                titleColor: UIColor.white,
-                body: [
-                    "": "\"Failed to locally sign a transaction\" usually means wrong password.",
-                ],
-                isEditable: false,
-                fieldViewHeight: 100,
-                messageTextAlignment: .left,
-                alertStyle: .noButton
             )
         ]
         
@@ -220,7 +213,8 @@ extension MainViewController {
                             Future<Bool, PostingError> { promise in
                                 DispatchQueue.global().async {
                                     do {
-                                        let _ = try txPackage.transaction.send(password: password, transactionOptions: nil)
+                                        let result = try txPackage.transaction.send(password: password, transactionOptions: nil)
+                                        print("result", result)
                                         promise(.success(true))
                                     } catch {
                                         promise(.failure(PostingError.generalError(reason: "Unable to execute the transaction. Please doublecheck your password.")))

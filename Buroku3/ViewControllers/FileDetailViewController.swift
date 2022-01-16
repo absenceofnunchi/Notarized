@@ -27,19 +27,23 @@ class FileDetailViewController: UITableViewController {
         self.data = data
 
         let mirror = Mirror(reflecting: data)
+        print("mirror", mirror)
         for child in mirror.children {
-            
+            print("child", child)
             var pd: ParsedData!
             if child.label == "index" {
-//                let value = String(child.value as! Int)
-//                pd = ParsedData(key: child.label!, value: value)
                 continue
             } else {
-                pd = ParsedData(key: child.label!, value: child.value as! String)
+                guard let label = child.label,
+                        let value = child.value as? String else {
+                    return
+                }
+                pd = ParsedData(key: label, value: value)
             }
             
             parsedData.append(pd)
         }
+        print("parsedData", parsedData)
     }
     
     required init?(coder: NSCoder) {
@@ -124,7 +128,7 @@ extension FileDetailViewController {
 // MARK: - table view delegate and data source
 extension FileDetailViewController: UITextFieldDelegate {
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 5
+        return 4
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -132,7 +136,7 @@ extension FileDetailViewController: UITextFieldDelegate {
     }
         
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.section == 4 {
+        if indexPath.section == 3 {
             let cell = GroupedButtonsCell()
             
             var previewImage: UIImage!
@@ -152,7 +156,7 @@ extension FileDetailViewController: UITextFieldDelegate {
             ]
             
             cell.set(with: buttonContentArr)
-            cell.buttonAction = { [weak self] (tag) in
+            cell.buttonAction = { [weak self] (tag) in                
                 switch tag {
                     case 0:
                         let webVC = WebViewController()
@@ -183,7 +187,7 @@ extension FileDetailViewController: UITextFieldDelegate {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section < 4 {
+        if section < 3 {
             return parsedData[section].key
         } else {
             return nil
@@ -191,7 +195,7 @@ extension FileDetailViewController: UITextFieldDelegate {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 4 {
+        if indexPath.section == 3 {
             return 70
         } else {
             return UITableView.automaticDimension

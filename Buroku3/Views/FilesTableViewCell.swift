@@ -47,6 +47,7 @@ extension FilesTableViewCell {
         contentView.addSubview(containerView)
         
         nameLabel = createlabel(in: containerView, with: .black)
+        nameLabel.alpha = 0
         hashLabel = createlabel(in: containerView)
         sizeLabel = createlabel(in: containerView)
         

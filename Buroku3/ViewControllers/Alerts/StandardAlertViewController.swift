@@ -111,6 +111,7 @@ extension StandardAlertViewController: UITextFieldDelegate {
         view.addSubview(titleLabel)
         
         customNavView = BackgroundView5()
+        customNavView.alpha = 0
         customNavView.translatesAutoresizingMaskIntoConstraints = false
         view.insertSubview(customNavView, belowSubview: titleLabel)
         
@@ -175,31 +176,8 @@ extension StandardAlertViewController: UITextFieldDelegate {
         buttonPanel.alpha = 0
         buttonPanel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(buttonPanel)
-        
-        //        okButton = UIButton()
-        //        okButton.alpha = alertStyle == .noButton ? 0 : 1
-        //        okButton.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
-        //        okButton.backgroundColor = UIColor(red: 25/255, green: 69/255, blue: 107/255, alpha: 1)
-        //        okButton.layer.cornerRadius = 10
-        //        okButton.tag = 1
-        //        okButton.setTitle(buttonTitle ?? "OK", for: .normal)
-        //        okButton.setTitleColor(.white, for: .normal)
-        //        okButton.titleLabel?.font = UIFont.rounded(ofSize: 20, weight: .medium)
-        //        okButton.translatesAutoresizingMaskIntoConstraints = false
-        //        buttonPanel.addSubview(okButton)
-        //
-        //        cancelButton = UIButton()
-        //        cancelButton.backgroundColor = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1)
-        //        cancelButton.layer.cornerRadius = 10
-        //        cancelButton.tag = 2
-        //        cancelButton.setTitle("Cancel", for: .normal)
-        //        cancelButton.titleLabel?.font = UIFont.rounded(ofSize: 20, weight: .medium)
-        //        cancelButton.setTitleColor( UIColor(red: 25/255, green: 69/255, blue: 107/255, alpha: 1), for: .normal)
-        //        cancelButton.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
-        //        cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        //        buttonPanel.addSubview(cancelButton)
-        
-        let okButtonInfo = ButtonInfo(title: "OK", tag: 1, backgroundColor: UIColor(red: 25/255, green: 69/255, blue: 107/255, alpha: 1))
+     
+        let okButtonInfo = ButtonInfo(title: "OK", tag: 1, backgroundColor:  UIColor(red: 112/255, green: 159/255, blue: 176/255, alpha: 0.8))
         okButton = createButton(buttonInfo: okButtonInfo)
         buttonPanel.addSubview(okButton)
         

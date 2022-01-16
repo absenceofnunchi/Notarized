@@ -73,7 +73,7 @@
 		498F17E0260E9B8500545190 /* ImportWalletViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 498F17DF260E9B8500545190 /* ImportWalletViewController.swift */; };
 		499E1F37261EB45200B4A07C /* LogoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499E1F36261EB45200B4A07C /* LogoView.swift */; };
 		49A4BDE02605AE3D009E8911 /* AlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A4BDDF2605AE3D009E8911 /* AlertsView.swift */; };
-		49A6042827912F3700F61FD5 /* MainViewController + UploadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A6042727912F3700F61FD5 /* MainViewController + UploadImage.swift */; };
+		49A6042827912F3700F61FD5 /* MainViewController + Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A6042727912F3700F61FD5 /* MainViewController + Upload.swift */; };
 		49A6042A27922BA200F61FD5 /* ContractMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A6042927922BA200F61FD5 /* ContractMethods.swift */; };
 		49A6042C27924F0000F61FD5 /* TxPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A6042B27924F0000F61FD5 /* TxPackage.swift */; };
 		49A6042F2792840F00F61FD5 /* StandardAlertViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A6042E2792840F00F61FD5 /* StandardAlertViewController.swift */; };
@@ -172,7 +172,7 @@
 		498F17DF260E9B8500545190 /* ImportWalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportWalletViewController.swift; sourceTree = "<group>"; };
 		499E1F36261EB45200B4A07C /* LogoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoView.swift; sourceTree = "<group>"; };
 		49A4BDDF2605AE3D009E8911 /* AlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsView.swift; sourceTree = "<group>"; };
-		49A6042727912F3700F61FD5 /* MainViewController + UploadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController + UploadImage.swift"; sourceTree = "<group>"; };
+		49A6042727912F3700F61FD5 /* MainViewController + Upload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController + Upload.swift"; sourceTree = "<group>"; };
 		49A6042927922BA200F61FD5 /* ContractMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContractMethods.swift; sourceTree = "<group>"; };
 		49A6042B27924F0000F61FD5 /* TxPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxPackage.swift; sourceTree = "<group>"; };
 		49A6042E2792840F00F61FD5 /* StandardAlertViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardAlertViewController.swift; sourceTree = "<group>"; };
@@ -369,7 +369,7 @@
 			isa = PBXGroup;
 			children = (
 				492D69472603DEF500FCDD20 /* MainViewController.swift */,
-				49A6042727912F3700F61FD5 /* MainViewController + UploadImage.swift */,
+				49A6042727912F3700F61FD5 /* MainViewController + Upload.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -639,7 +639,7 @@
 				49D9C408260C769A0014960A /* BackgroundView5.swift in Sources */,
 				49624D4726015160006C42AF /* DocumentPicker.swift in Sources */,
 				49EF5A232616B438006845B0 /* WebViewController.swift in Sources */,
-				49A6042827912F3700F61FD5 /* MainViewController + UploadImage.swift in Sources */,
+				49A6042827912F3700F61FD5 /* MainViewController + Upload.swift in Sources */,
 				492D69452603DE6100FCDD20 /* FilesViewController.swift in Sources */,
 				49A6042A27922BA200F61FD5 /* ContractMethods.swift in Sources */,
 				492D69DE26051BD600FCDD20 /* Errors.swift in Sources */,

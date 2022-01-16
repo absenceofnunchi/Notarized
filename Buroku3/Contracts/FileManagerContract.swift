@@ -9,8 +9,14 @@ import Foundation
 import web3swift
 
 // MARK: - FileManager
+/// mainnet
 //let fileManagerContractAddress = EthereumAddress("0x3a3596b99a90937ce2c87502d977686bdae3b734")
-let fileManagerContractAddress = EthereumAddress("0x01F4f8E268f278C9e4DB60B7d4Ff83a367d35697")
+
+/// rinkeby testnet
+//let fileManagerContractAddress = EthereumAddress("0x01F4f8E268f278C9e4DB60B7d4Ff83a367d35697")
+
+/// ropsten testnet
+let fileManagerContractAddress = EthereumAddress("0xede46354eb9c6312ec13fb2e2de693b139a3a08a")
 
 let fileManagerABI = """
 [
@@ -222,3 +228,136 @@ let accountBytecode = """
 
 // private key d148f77901fa743b57fd10a0415bb5b5375309b87dc31578846b63fb855c2e47
 // 94853b85a808220053f0fecb17d7ac1c004e93ed390ae1d6e9f7f45f2422bf5c
+
+
+let a = """
+[
+    {
+        "inputs": [
+            {
+                "internalType": "uint16",
+                "name": "_index",
+                "type": "uint16"
+            }
+        ],
+        "name": "deleteFile",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getAllFiles",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "ipfsHash",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "date",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "index",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "size",
+                        "type": "uint32"
+                    }
+                ],
+                "internalType": "struct FileManager.File[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_index",
+                "type": "uint256"
+            }
+        ],
+        "name": "getFile",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "ipfsHash",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "date",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "index",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "size",
+                        "type": "uint32"
+                    }
+                ],
+                "internalType": "struct FileManager.File",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_ipfsHash",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "date",
+                "type": "string"
+            },
+            {
+                "internalType": "uint32",
+                "name": "_size",
+                "type": "uint32"
+            },
+            {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+            }
+        ],
+        "name": "setFile",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]
+"""

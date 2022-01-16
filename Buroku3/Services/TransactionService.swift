@@ -220,7 +220,10 @@ class TransactionService {
         parameters: [AnyObject],
         promise: @escaping (Result<TxPackage, PostingError>) -> Void
     ) {
-        guard let address = Web3swiftService.currentAddress else { return }
+        guard let address = Web3swiftService.currentAddress else {
+            promise(.failure(.retrievingCurrentAddressError))
+            return
+        }
         var options = TransactionOptions.defaultOptions
         options.from = address
         options.gasLimit = TransactionOptions.GasLimitPolicy.automatic
@@ -232,7 +235,6 @@ class TransactionService {
             return
         }
         
-        print("method.rawValue", method.rawValue)
         guard let transaction = contract.write(method.rawValue, parameters: parameters, extraData: Data(), transactionOptions: options) else {
             promise(.failure(.createTransactionIssue))
             return
@@ -248,13 +250,14 @@ class TransactionService {
     }
     
     // MARK: - prepareTransactionFiles
-    final func prepareTransactionForFiles(method: String, parameters: [AnyObject] = [AnyObject](), completion: @escaping (ReadTransaction?, SendEthErrors?) -> Void) {
+    final func prepareTransactionForGetFiles(method: ContractMethods, parameters: [AnyObject] = [AnyObject](), completion: @escaping (ReadTransaction?, SendEthErrors?) -> Void) {
         guard let address = Web3swiftService.currentAddress else {
             DispatchQueue.main.async {
                 completion(nil, SendEthErrors.noAvailableKeys)
             }
             return
         }
+        
         var options = TransactionOptions.defaultOptions
         options.from = address
         options.gasLimit = TransactionOptions.GasLimitPolicy.automatic
@@ -268,7 +271,7 @@ class TransactionService {
             return
         }
         
-        guard let transaction = contract.read(method, parameters: parameters, extraData: Data(), transactionOptions: options) else {
+        guard let transaction = contract.read(method.rawValue, parameters: parameters, extraData: Data(), transactionOptions: options) else {
             DispatchQueue.main.async {
                 completion(nil, SendEthErrors.createTransactionIssue)
             }
@@ -278,6 +281,36 @@ class TransactionService {
         DispatchQueue.main.async {
             completion(transaction, nil)
         }
+    }
+    
+    /// Combine version
+    final func prepareTransactionForGetFiles(
+        method: ContractMethods,
+        parameters: [AnyObject] = [AnyObject](),
+        promise: @escaping (Result<ReadTransaction, PostingError>) -> Void
+    ) {
+        guard let address = Web3swiftService.currentAddress else {
+            promise(.failure(.retrievingCurrentAddressError))
+            return
+        }
+        
+        var options = TransactionOptions.defaultOptions
+        options.from = address
+        options.gasLimit = TransactionOptions.GasLimitPolicy.automatic
+        options.gasPrice = TransactionOptions.GasPricePolicy.automatic
+        
+        let web3 = Web3swiftService.web3instance
+        guard let contract = web3.contract(fileManagerABI, at: fileManagerContractAddress, abiVersion: 2) else {
+            promise(.failure(.contractLoadingError))
+            return
+        }
+        
+        guard let transaction = contract.read(method.rawValue, parameters: parameters, extraData: Data(), transactionOptions: options) else {
+            promise(.failure(.createTransactionIssue))
+            return
+        }
+        
+        promise(.success(transaction))
     }
     
     final func prepareTransactionForDeletingFiles(method: String, parameters: [AnyObject] = [AnyObject](), completion: @escaping (WriteTransaction?, SendEthErrors?) -> Void) {

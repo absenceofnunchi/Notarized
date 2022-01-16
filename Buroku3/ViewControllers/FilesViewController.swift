@@ -8,10 +8,10 @@
 import UIKit
 import BigInt
 import web3swift
+import Combine
 import CoreSpotlight
 
 struct BlockchainData {
-    let name: String
     let hash: String
     let size: String
     let date: String
@@ -26,6 +26,7 @@ class FilesViewController: UIViewController {
     var pullControl: UIRefreshControl!
     var searchController: UISearchController!
     var searchResultsController: SearchResultsController!
+    var anyCancellable = Set<AnyCancellable>()
     
     override func loadView() {
         super.loadView()
@@ -51,28 +52,18 @@ extension FilesViewController {
     // MARK: - fetchData
     func fetchData() {
         self.activityStartAnimating(activityColor: UIColor.darkGray, backgroundColor: UIColor(red: 211/255, green: 211/255, blue: 211/255, alpha: 0.5))
-        transactionService.prepareTransactionForFiles(method: "getAllFiles") { [weak self] (transaction, error) in
-            if let error = error {
-                self?.activityStopAnimating()
-                switch error {
-                    case .noAvailableKeys:
-                        self?.alert.show("No Wallet", with: "Please create or import your wallet first.", for: self!)
-                        break
-                    default:
-                        DispatchQueue.main.async {
-                            self?.alert.show("Error", with: "There was an error preparing to fetch data from the blockchain.", for: self!) {
-                                DispatchQueue.main.async {
-                                    self?.activityStopAnimating()
-                                }
-                            }
-                        }
-                }
+        
+        Deferred {
+            Future<ReadTransaction, PostingError> { [weak self] promise in
+                self?.transactionService.prepareTransactionForGetFiles(method: .getAllFiles, promise: promise)
             }
-                        
-            if let transaction = transaction {
+            .eraseToAnyPublisher()
+        }
+        .flatMap({ [weak self] (transaction) in
+            Future<BlockchainData, PostingError> { promise in
                 DispatchQueue.global().async {
                     do {
-                        let results = try transaction.call()
+                        let results: [String: Any] = try transaction.call()
                         
                         for (_, value) in results {
                             let valueObject = (value as! [[Any]])
@@ -82,43 +73,48 @@ extension FilesViewController {
                                 if let hash = vo[0] as? String,
                                    let date = vo[1] as? String,
                                    let indexBigInt = vo[3] as? BigUInt,
-                                   let name = vo[2] as? String,
+                                   let _ = vo[2] as? String,
                                    let size = vo[4] as? BigUInt {
                                     let sizeString = String(size)
                                     let index = Int(indexBigInt)
-                                    let bd = BlockchainData(name: name, hash: hash, size: sizeString, date: date, index: index)
-                                    self?.data.append(bd)
+                                    let blockchainData = BlockchainData(hash: hash, size: sizeString, date: date, index: index)
+                                    promise(.success(blockchainData))
                                 }
-                            }
-                        }
-                        DispatchQueue.main.async {
-                            self?.activityStopAnimating()
-                            self?.tableView.reloadData()
-                        }
-                    } catch Web3Error.nodeError(let desc) {
-                        if let index = desc.firstIndex(of: ":") {
-                            let newIndex = desc.index(after: index)
-                            let newStr = desc[newIndex...]
-                            DispatchQueue.main.async {
-                                self?.alert.show("Alert", with: String(newStr), for: self!, completion: {
-                                    DispatchQueue.main.async {
-                                        self?.activityStopAnimating()
-                                    }
-                                })
                             }
                         }
                     } catch {
-                        DispatchQueue.main.async {
-                            self?.alert.show("Error", with: "There was an error fetching data from the blockchain", for: self!, completion: {
-                                DispatchQueue.main.async {
-                                    self?.activityStopAnimating()
-                                }
-                            })
+                        if let err = error as? Web3Error {
+                            promise(.failure(.generalError(reason: err.errorDescription)))
+                        } else {
+                            promise(.failure(.generalError(reason: "Unable to parse the fetch result.")))
                         }
                     }
                 }
             }
-        }
+            .eraseToAnyPublisher()
+        })
+        .sink(receiveCompletion: { [weak self] (completion) in
+            self?.activityStopAnimating()
+            switch completion {
+                case .failure(let error):
+                    switch error {
+                        case .generalError(reason: let msg):
+                            self?.alert.showDetail("Error", with: msg, for: self)
+                            break
+                        default:
+                            self?.alert.showDetail("Error", with: "There was an error fetching data from the blockchain.", for: self)
+                    }
+                    break
+                case .finished:
+                    break
+            }
+        }, receiveValue: { [weak self] (blockchainData) in
+            DispatchQueue.main.async {
+                self?.data.append(blockchainData)
+                self?.tableView.reloadData()
+            }
+        })
+        .store(in: &anyCancellable)
     }
     
     // MARK: - configureUI
@@ -199,11 +195,13 @@ extension FilesViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.filesCell, for: indexPath) as! FilesTableViewCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.filesCell, for: indexPath) as? FilesTableViewCell else {
+            fatalError()
+        }
         cell.selectionStyle = .none
         
         let datum = data[indexPath.row]
-        cell.set(hash: datum.hash, date: datum.date, size: datum.size, name: datum.name)
+        cell.set(hash: datum.hash, date: datum.date, size: datum.size, name: " ")
             
         return cell
     }

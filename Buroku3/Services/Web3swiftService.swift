@@ -11,12 +11,18 @@ import BigInt
 
 class Web3swiftService {
     static let keyservice = KeysService()
-    
+  
     static var web3instance: web3 {
-        let web3Rinkeby = Web3.InfuraRinkebyWeb3()
+        let web3Rinkeby = Web3.InfuraRopstenWeb3()
         web3Rinkeby.addKeystoreManager(self.keyservice.keystoreManager())
         return web3Rinkeby
     }
+    
+//    static var web3instance: web3 {
+//        let web3Rinkeby = Web3.InfuraRinkebyWeb3()
+//        web3Rinkeby.addKeystoreManager(self.keyservice.keystoreManager())
+//        return web3Rinkeby
+//    }
     
 //    static var web3instance: web3 {
 //        let web3Ropsten = Web3.InfuraMainnetWeb3()

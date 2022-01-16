@@ -33,11 +33,14 @@ extension SearchResultsController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: Cell.filesCell, for: indexPath) as! FilesTableViewCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Cell.filesCell, for: indexPath) as? FilesTableViewCell else {
+            fatalError()
+        }
+        
         cell.selectionStyle = .none
         
         let datum = data[indexPath.row]
-        cell.set(hash: datum.hash, date: datum.date, size: datum.size, name: datum.name)
+        cell.set(hash: datum.hash, date: datum.date, size: datum.size, name: " ")
         
         return cell
     }

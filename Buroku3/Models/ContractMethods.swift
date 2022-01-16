@@ -9,4 +9,5 @@ import Foundation
 
 enum ContractMethods: String {
     case setFile
+    case getAllFiles
 }

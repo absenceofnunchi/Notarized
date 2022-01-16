@@ -21,7 +21,7 @@ extension FilesViewController: UISearchResultsUpdating {
         var curTerm = searchItems[0]
         var idx = 0
         while curTerm != "" {
-            filtered = filtered.filter { $0.name.lowercased().contains(curTerm) }
+            filtered = filtered.filter { $0.hash.lowercased().contains(curTerm) }
             idx += 1
             curTerm = (idx < searchItems.count) ? searchItems[idx] : ""
         }
