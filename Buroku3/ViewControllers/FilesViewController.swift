@@ -59,8 +59,9 @@ extension FilesViewController {
             }
             .eraseToAnyPublisher()
         }
-        .flatMap({ [weak self] (transaction) in
-            Future<BlockchainData, PostingError> { promise in
+        .flatMap({ [weak self] (transaction) -> AnyPublisher<[BlockchainData], PostingError> in
+            var dataArr = [BlockchainData]()
+            return Future<[BlockchainData], PostingError> { promise in
                 DispatchQueue.global().async {
                     do {
                         let results: [String: Any] = try transaction.call()
@@ -78,10 +79,12 @@ extension FilesViewController {
                                     let sizeString = String(size)
                                     let index = Int(indexBigInt)
                                     let blockchainData = BlockchainData(hash: hash, size: sizeString, date: date, index: index)
-                                    promise(.success(blockchainData))
+                                    dataArr.append(blockchainData)
                                 }
                             }
                         }
+                        
+                        promise(.success(dataArr))
                     } catch {
                         if let err = error as? Web3Error {
                             promise(.failure(.generalError(reason: err.errorDescription)))
@@ -108,9 +111,9 @@ extension FilesViewController {
                 case .finished:
                     break
             }
-        }, receiveValue: { [weak self] (blockchainData) in
+        }, receiveValue: { [weak self] (blockchainDataArr) in
             DispatchQueue.main.async {
-                self?.data.append(blockchainData)
+                self?.data.append(contentsOf: blockchainDataArr)
                 self?.tableView.reloadData()
             }
         })
@@ -261,7 +264,7 @@ extension FilesViewController: UISearchBarDelegate, UISearchControllerDelegate {
         searchTextField.layer.borderWidth = 1
         searchTextField.layer.borderColor = UIColor(red: 224/255, green: 224/255, blue: 224/255, alpha: 1).cgColor
         searchTextField.textColor = .white
-        searchTextField.attributedPlaceholder =  NSAttributedString(string: "Enter Search Here", attributes: [NSAttributedString.Key.foregroundColor : UIColor.white])
+        searchTextField.attributedPlaceholder =  NSAttributedString(string: "Enter IPFS Hash Here", attributes: [NSAttributedString.Key.foregroundColor : UIColor.white])
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {

@@ -63,7 +63,7 @@ extension MainViewController {
         documentPicker = DocumentPicker(presentationController: self, delegate: self)
         
         titleLabel = UILabel()
-        titleLabel.text = "buroku"
+        titleLabel.text = "notorized"
         titleLabel.sizeToFit()
         if let roundedHeadlineDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.rounded) {
             let roundedFont = UIFont(descriptor: roundedHeadlineDescriptor, size: 30).with(weight: .bold)

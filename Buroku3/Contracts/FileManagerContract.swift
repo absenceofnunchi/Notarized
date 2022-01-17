@@ -10,13 +10,13 @@ import web3swift
 
 // MARK: - FileManager
 /// mainnet
-//let fileManagerContractAddress = EthereumAddress("0x3a3596b99a90937ce2c87502d977686bdae3b734")
+let fileManagerContractAddress = EthereumAddress("0x3a3596b99a90937ce2c87502d977686bdae3b734")
 
 /// rinkeby testnet
 //let fileManagerContractAddress = EthereumAddress("0x01F4f8E268f278C9e4DB60B7d4Ff83a367d35697")
 
 /// ropsten testnet
-let fileManagerContractAddress = EthereumAddress("0xede46354eb9c6312ec13fb2e2de693b139a3a08a")
+//let fileManagerContractAddress = EthereumAddress("0xede46354eb9c6312ec13fb2e2de693b139a3a08a")
 
 let fileManagerABI = """
 [

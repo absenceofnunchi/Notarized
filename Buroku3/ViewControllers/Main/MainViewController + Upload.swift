@@ -15,11 +15,15 @@ import Combine
 
 extension MainViewController: HandleError {
     final func upload<T>(_ data: T) {
+        self.presendAnimation()
         self.transactionService.preLaunch { [weak self] in
             return self?.uploadAndGetEstimate(data: data) ?? Fail(error: PostingError.generalError(reason: "Unable to get the transaction gas estimate."))
                 .eraseToAnyPublisher()
         } completionHandler: { [weak self] (estimates, txPackage, error) in
             if let error = error {
+                self?.hideSpinner()
+                self?.activityStopAnimating()
+                self?.presendAnimation(isReversed: true)
                 self?.processFailure(error)
             }
             
@@ -67,19 +71,18 @@ extension MainViewController {
         switch data {
             case let image as UIImage:
                 // build request URL
-//                guard let requestURL = URL(string: "https://rnomzrlwo6.execute-api.us-east-1.amazonaws.com/addImage") else {
-//                    return Fail(error: PostingError.generalError(reason: "There was an error broadcasting your post to the subscribers."))
-//                        .eraseToAnyPublisher()
-//                }
-                
-                guard let requestURL = URL(string: "http://localhost:3000/addImage") else {
+                guard let requestURL = URL(string: "https://rnomzrlwo6.execute-api.us-east-1.amazonaws.com/addImage") else {
                     return Fail(error: PostingError.generalError(reason: "There was an error broadcasting your post to the subscribers."))
                         .eraseToAnyPublisher()
                 }
                 
+//                guard let requestURL = URL(string: "http://localhost:3000/addImage") else {
+//                    return Fail(error: PostingError.generalError(reason: "There was an error broadcasting your post to the subscribers."))
+//                        .eraseToAnyPublisher()
+//                }
+                
                 request = URLRequest(url: requestURL)
                 request.httpMethod = MethodHttp.post.rawValue
-                request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
                 // built data from img
                 if let imageData = image.jpegData(compressionQuality: 0.9) {
@@ -91,10 +94,10 @@ extension MainViewController {
                         .eraseToAnyPublisher()
                 }
                 
-                //        guard let requestURL = URL(string: "http://localhost:3000/addFile") else {
-                //            return Fail(error: PostingError.generalError(reason: "There was an error broadcasting your post to the subscribers."))
-                //                .eraseToAnyPublisher()
-                //        }
+//                guard let requestURL = URL(string: "http://localhost:3000/addFile") else {
+//                    return Fail(error: PostingError.generalError(reason: "There was an error broadcasting your post to the subscribers."))
+//                        .eraseToAnyPublisher()
+//                }
                 
                 request = URLRequest(url: requestURL)
                 request.httpMethod = MethodHttp.post.rawValue
@@ -103,7 +106,8 @@ extension MainViewController {
                 break
         }
         
-        
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
         let session = URLSession.shared
         return session.dataTaskPublisher(for: request)
             .tryMap() { element -> [AnyObject] in
@@ -180,7 +184,6 @@ extension MainViewController {
             StandardAlertContent(
                 index: 1,
                 titleString: "Gas Estimate",
-                titleColor: UIColor.white,
                 body: [
                     "Total Gas Units": txPackage.gasEstimate.description,
                     "Gas Price": "\(estimates.gasPriceInGwei) Gwei",
@@ -223,6 +226,9 @@ extension MainViewController {
                             }
                         }
                         .sink { completion in
+                            self?.hideSpinner()
+                            self?.activityStopAnimating()
+                            self?.presendAnimation(isReversed: true)
                             switch completion {
                                 case .failure(let error):
                                     self?.processFailure(error)
@@ -240,6 +246,56 @@ extension MainViewController {
             } // alertVC.action
             self?.present(alertVC, animated: true, completion: nil)
         }
+    }
+}
+
+extension MainViewController {
+    func presendAnimation(isReversed: Bool = false) {
+        let totalCount = 3
+        //        let duration = 1.0 / Double(totalCount)
+        let duration = Double(0.5)
+        
+        let animation = UIViewPropertyAnimator(duration: 0.5, timingParameters: UICubicTimingParameters())
+        animation.addAnimations {
+            
+            switch isReversed {
+                case false:
+                    DispatchQueue.main.async {
+                        UIView.animateKeyframes(withDuration: 0, delay: 0, animations: { [weak self] in
+                            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: duration) {
+                                self?.titleLabel.alpha = 0
+                            }
+                            
+                            UIView.addKeyframe(withRelativeStartTime: 1/Double(totalCount), relativeDuration: duration) {
+                                //                            self?.containerView.center = CGPoint(x: self!.view.bounds.size.width / 2, y: 250)
+                                self?.containerView.transform = CGAffineTransform(translationX: 0, y: -100)
+                            }
+                            
+                            UIView.addKeyframe(withRelativeStartTime: 1.5/Double(totalCount), relativeDuration: duration) {
+                                self?.progressContainerView.alpha = 1
+                            }
+                        })
+                    }
+                case true:
+                    DispatchQueue.main.async {
+                        UIView.animateKeyframes(withDuration: 0, delay: 0, animations: { [weak self] in
+                            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.2) {
+                                self?.progressContainerView.alpha = 0
+                            }
+                            
+                            UIView.addKeyframe(withRelativeStartTime: 1 / Double(totalCount), relativeDuration: duration) {
+                                self?.containerView.transform = .identity
+                            }
+                            
+                            UIView.addKeyframe(withRelativeStartTime: 2 / Double(totalCount), relativeDuration: duration) {
+                                self?.titleLabel.alpha = 1
+                            }
+                        })
+                    }
+            }
+        }
+        
+        animation.startAnimation()
     }
 }
 

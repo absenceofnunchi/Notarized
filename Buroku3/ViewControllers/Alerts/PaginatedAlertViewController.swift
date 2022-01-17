@@ -61,6 +61,7 @@ class AlertViewController: UIPageViewController {
 
 extension AlertViewController: DataFetchDelegate {
     private func configure() {
+        self.hideKeyboardWhenTappedAround()
         
         // used for indexing page vc's
         indexArray = contentArray.map { $0.index }
@@ -133,5 +134,88 @@ extension AlertViewController: UIPageViewControllerDataSource, UIPageViewControl
               }
         
         return newIndex
+    }
+}
+
+// MARK: - TransitioningDelegate
+class TransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
+    var height: CGFloat!
+    
+    init(height: CGFloat = 300) {
+        self.height = height
+    }
+    
+    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        return PresentationController(presentedViewController: presented, presenting: presenting, height: height)
+    }
+}
+
+// MARK: - PresentationController
+class PresentationController: UIPresentationController {
+    var height: CGFloat!
+    
+    let dimmingView: UIView = {
+        let dimmingView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        let tap = UIGestureRecognizer(target: self,  action: #selector(tapped))
+        dimmingView.addGestureRecognizer(tap)
+        dimmingView.translatesAutoresizingMaskIntoConstraints = false
+        return dimmingView
+    }()
+    
+    override var frameOfPresentedViewInContainerView: CGRect {
+        let bounds = presentingViewController.view.bounds
+        let size = CGSize(width: bounds.size.width * 0.8, height: height)
+        let origin = CGPoint(x: bounds.midX - size.width / 2, y: bounds.midY - size.height / 2)
+        return CGRect(origin: origin, size: size)
+    }
+    
+    init(presentedViewController: UIViewController, presenting presentingViewController: UIViewController?, height: CGFloat) {
+        super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
+        
+        self.height = height
+        presentedView?.autoresizingMask = [
+            .flexibleTopMargin,
+            .flexibleBottomMargin,
+            .flexibleLeftMargin,
+            .flexibleRightMargin
+        ]
+        
+        presentedView?.translatesAutoresizingMaskIntoConstraints = true
+        let tap = UIGestureRecognizer(target: self,  action: #selector(tapped))
+        presentedView?.addGestureRecognizer(tap)
+    }
+    
+    @objc func tapped() {
+        presentedView?.endEditing(true)
+    }
+}
+
+extension PresentationController {
+    override func presentationTransitionWillBegin() {
+        super.presentationTransitionWillBegin()
+        
+        let superview = presentingViewController.view!
+        superview.addSubview(dimmingView)
+        NSLayoutConstraint.activate([
+            dimmingView.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
+            dimmingView.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
+            dimmingView.bottomAnchor.constraint(equalTo: superview.bottomAnchor),
+            dimmingView.topAnchor.constraint(equalTo: superview.topAnchor)
+        ])
+        
+        dimmingView.alpha = 0
+        presentingViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
+            self.dimmingView.alpha = 0.9
+        }, completion: nil)
+    }
+    
+    override func dismissalTransitionWillBegin() {
+        super.dismissalTransitionWillBegin()
+        
+        presentingViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
+            self.dimmingView.alpha = 0
+        }, completion: { _ in
+            self.dimmingView.removeFromSuperview()
+        })
     }
 }

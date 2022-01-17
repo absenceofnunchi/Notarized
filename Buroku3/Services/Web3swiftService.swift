@@ -12,11 +12,11 @@ import BigInt
 class Web3swiftService {
     static let keyservice = KeysService()
   
-    static var web3instance: web3 {
-        let web3Rinkeby = Web3.InfuraRopstenWeb3()
-        web3Rinkeby.addKeystoreManager(self.keyservice.keystoreManager())
-        return web3Rinkeby
-    }
+//    static var web3instance: web3 {
+//        let web3Rinkeby = Web3.InfuraRopstenWeb3()
+//        web3Rinkeby.addKeystoreManager(self.keyservice.keystoreManager())
+//        return web3Rinkeby
+//    }
     
 //    static var web3instance: web3 {
 //        let web3Rinkeby = Web3.InfuraRinkebyWeb3()
@@ -24,11 +24,11 @@ class Web3swiftService {
 //        return web3Rinkeby
 //    }
     
-//    static var web3instance: web3 {
-//        let web3Ropsten = Web3.InfuraMainnetWeb3()
-//        web3Ropsten.addKeystoreManager(self.keyservice.keystoreManager())
-//        return web3Ropsten
-//    }
+    static var web3instance: web3 {
+        let web3Ropsten = Web3.InfuraMainnetWeb3()
+        web3Ropsten.addKeystoreManager(self.keyservice.keystoreManager())
+        return web3Ropsten
+    }
     
     static var currentAddress: EthereumAddress? {
         let wallet = self.keyservice.selectedWallet()

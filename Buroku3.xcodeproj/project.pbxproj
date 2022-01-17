@@ -130,7 +130,7 @@
 		495986512607A95F0018A0BC /* WalletViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewController.swift; sourceTree = "<group>"; };
 		495986542607D5F70018A0BC /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		4959865726080DF10018A0BC /* BackgroundView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView2.swift; sourceTree = "<group>"; };
-		49624D2726014463006C42AF /* Buroku3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Buroku3.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		49624D2726014463006C42AF /* Notarized.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Notarized.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49624D2A26014463006C42AF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49624D2C26014463006C42AF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		49624D3126014463006C42AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -288,7 +288,7 @@
 		49624D2826014463006C42AF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				49624D2726014463006C42AF /* Buroku3.app */,
+				49624D2726014463006C42AF /* Notarized.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -480,7 +480,7 @@
 			);
 			name = Buroku3;
 			productName = Buroku3;
-			productReference = 49624D2726014463006C42AF /* Buroku3.app */;
+			productReference = 49624D2726014463006C42AF /* Notarized.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -818,9 +818,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.3;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku4;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Notarized;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -841,9 +841,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.3;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku4;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Notarized;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
