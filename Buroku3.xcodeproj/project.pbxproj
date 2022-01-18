@@ -818,8 +818,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku4;
+				MARKETING_VERSION = 0.1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.ipfsnotarized;
 				PRODUCT_NAME = Notarized;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -841,8 +841,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.Buroku4;
+				MARKETING_VERSION = 0.1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ovis.ipfsnotarized;
 				PRODUCT_NAME = Notarized;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
