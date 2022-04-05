@@ -14,6 +14,14 @@
 		4908401626159AEA00CC26C9 /* KeyWallet+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4908401226159AEA00CC26C9 /* KeyWallet+CoreDataClass.swift */; };
 		4908401726159AEA00CC26C9 /* KeyWallet+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4908401326159AEA00CC26C9 /* KeyWallet+CoreDataProperties.swift */; };
 		4908401A2615B2BC00CC26C9 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490840192615B2BC00CC26C9 /* ButtonCell.swift */; };
+		491AA68627FC017A00D50D40 /* 4.png in Resources */ = {isa = PBXBuildFile; fileRef = 491AA67E27FC017900D50D40 /* 4.png */; };
+		491AA68727FC017A00D50D40 /* 5.png in Resources */ = {isa = PBXBuildFile; fileRef = 491AA67F27FC017900D50D40 /* 5.png */; };
+		491AA68827FC017A00D50D40 /* 6.png in Resources */ = {isa = PBXBuildFile; fileRef = 491AA68027FC017900D50D40 /* 6.png */; };
+		491AA68927FC017A00D50D40 /* 2.png in Resources */ = {isa = PBXBuildFile; fileRef = 491AA68127FC017900D50D40 /* 2.png */; };
+		491AA68A27FC017A00D50D40 /* 3.png in Resources */ = {isa = PBXBuildFile; fileRef = 491AA68227FC017900D50D40 /* 3.png */; };
+		491AA68B27FC017A00D50D40 /* 1.png in Resources */ = {isa = PBXBuildFile; fileRef = 491AA68327FC017900D50D40 /* 1.png */; };
+		491AA68C27FC017A00D50D40 /* 0.png in Resources */ = {isa = PBXBuildFile; fileRef = 491AA68427FC017900D50D40 /* 0.png */; };
+		491AA68D27FC017A00D50D40 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 491AA68527FC017A00D50D40 /* README.md */; };
 		492D693B2603C0DD00FCDD20 /* MenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D693A2603C0DD00FCDD20 /* MenuTableViewController.swift */; };
 		492D69402603C1ED00FCDD20 /* SlideInTransitionAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D693F2603C1EC00FCDD20 /* SlideInTransitionAnimator.swift */; };
 		492D69452603DE6100FCDD20 /* FilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492D69442603DE6100FCDD20 /* FilesViewController.swift */; };
@@ -110,6 +118,14 @@
 		4908401226159AEA00CC26C9 /* KeyWallet+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyWallet+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		4908401326159AEA00CC26C9 /* KeyWallet+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyWallet+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		490840192615B2BC00CC26C9 /* ButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCell.swift; sourceTree = "<group>"; };
+		491AA67E27FC017900D50D40 /* 4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 4.png; sourceTree = "<group>"; };
+		491AA67F27FC017900D50D40 /* 5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 5.png; sourceTree = "<group>"; };
+		491AA68027FC017900D50D40 /* 6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 6.png; sourceTree = "<group>"; };
+		491AA68127FC017900D50D40 /* 2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 2.png; sourceTree = "<group>"; };
+		491AA68227FC017900D50D40 /* 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3.png; sourceTree = "<group>"; };
+		491AA68327FC017900D50D40 /* 1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 1.png; sourceTree = "<group>"; };
+		491AA68427FC017900D50D40 /* 0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 0.png; sourceTree = "<group>"; };
+		491AA68527FC017A00D50D40 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		492D693A2603C0DD00FCDD20 /* MenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuTableViewController.swift; sourceTree = "<group>"; };
 		492D693F2603C1EC00FCDD20 /* SlideInTransitionAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideInTransitionAnimator.swift; sourceTree = "<group>"; };
 		492D69442603DE6100FCDD20 /* FilesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesViewController.swift; sourceTree = "<group>"; };
@@ -223,6 +239,20 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		491AA67D27FC017900D50D40 /* ReadmeAssets */ = {
+			isa = PBXGroup;
+			children = (
+				491AA67E27FC017900D50D40 /* 4.png */,
+				491AA67F27FC017900D50D40 /* 5.png */,
+				491AA68027FC017900D50D40 /* 6.png */,
+				491AA68127FC017900D50D40 /* 2.png */,
+				491AA68227FC017900D50D40 /* 3.png */,
+				491AA68327FC017900D50D40 /* 1.png */,
+				491AA68427FC017900D50D40 /* 0.png */,
+			);
+			path = ReadmeAssets;
+			sourceTree = "<group>";
+		};
 		492D693E2603C1D700FCDD20 /* Animators */ = {
 			isa = PBXGroup;
 			children = (
@@ -278,6 +308,8 @@
 		49624D1E26014463006C42AF = {
 			isa = PBXGroup;
 			children = (
+				491AA68527FC017A00D50D40 /* README.md */,
+				491AA67D27FC017900D50D40 /* ReadmeAssets */,
 				49624D2926014463006C42AF /* Buroku3 */,
 				49624D2826014463006C42AF /* Products */,
 				4A3057C30718535D92BA02BD /* Pods */,
@@ -520,14 +552,22 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				491AA68927FC017A00D50D40 /* 2.png in Resources */,
+				491AA68727FC017A00D50D40 /* 5.png in Resources */,
 				49624D972601A41C006C42AF /* 6.json in Resources */,
 				49624D372601446C006C42AF /* LaunchScreen.storyboard in Resources */,
 				49624D822601A41C006C42AF /* 4.json in Resources */,
+				491AA68A27FC017A00D50D40 /* 3.png in Resources */,
 				49624D812601A41C006C42AF /* 3.json in Resources */,
 				49624D342601446C006C42AF /* Assets.xcassets in Resources */,
+				491AA68C27FC017A00D50D40 /* 0.png in Resources */,
+				491AA68827FC017A00D50D40 /* 6.png in Resources */,
+				491AA68B27FC017A00D50D40 /* 1.png in Resources */,
+				491AA68D27FC017A00D50D40 /* README.md in Resources */,
 				49624D3226014463006C42AF /* Main.storyboard in Resources */,
 				49624D882601A41C006C42AF /* 1.json in Resources */,
 				49624D9D2601A41C006C42AF /* 2.json in Resources */,
+				491AA68627FC017A00D50D40 /* 4.png in Resources */,
 				49624D952601A41C006C42AF /* 5.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
