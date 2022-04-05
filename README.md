@@ -135,7 +135,7 @@ final func upload<T>(_ data: T) {
 1. Allows users to select a local image or a PDF file either from the iOS photo gallery, camera, or the file manager.
 
 ![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/1.png)
-
+    
 2. Ethereum wallet.
 
 ![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/2.png)
@@ -156,25 +156,6 @@ final func upload<T>(_ data: T) {
 
 ![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/6.png)
 
-7. Chat inbox interface. Trailing swipe shortcuts to recipient, post, report, delete, etc.
-
-![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/7.png)
-
-8. Quick Unique Identifier check provides the ability to check the existence of an identifier in Firestore without going through the listing process.
-
-![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/8.png)
-
-9. A seller is able to specify the shipping availability by location or distance
-
-![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/9.png)
-
-10. The auction detail of a listed item shows the relevant information needed for a bidder
-
-![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/10.png)
-
-11. A visual indicator of the status of a sale.  The circles are filled out as the stage progresses.
-
-![](https://github.com/igibliss00/Notarized/blob/main/ReadmeAssets/11.png)
 
 ## Video Demo
 
